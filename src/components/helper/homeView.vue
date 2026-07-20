@@ -2,12 +2,12 @@
   <div class="HomeView">
     <div class="begin">
       <div class="content">
-        <div class="flex h-screen w-full overflow-hidden">
+        <div class="flex h-screen w-full overflow-hidden bg-slate-100">
           <div class="sidebar">
             <TheSidebar />
           </div>
-          <div class="bg-[#EFF2F5] w-full px-8 pb-6 h-screen overflow-y-scroll">
-            <div class="header fixed z-50 mr-8">
+          <div class="bg- w-full h-screen overflow-y-scroll">
+            <div class="header fixed z-50 ">
               <TheHeader />
             </div>
             <br />

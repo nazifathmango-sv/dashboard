@@ -1,11 +1,8 @@
 <template>
-  <HomeView />
    <div class="bg-white rounded-xl shadow p-5">
-
     <h2 class="text-xl font-bold mb-5">
       Réservations mensuelles
     </h2>
-
     <apexchart
       width="100%"
       height="350"
@@ -16,9 +13,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import HomeView from '@/components/helper/homeView.vue'
 const chartOptions = {
-
   chart:{
     id:"reservation-chart"
   },
@@ -35,7 +30,6 @@ const chartOptions = {
   colors:[
     "#fbbf24"
   ]
-
 }
 const series = [
 
@@ -50,6 +44,5 @@ const series = [
       70
     ]
   }
-
 ]
 </script>
