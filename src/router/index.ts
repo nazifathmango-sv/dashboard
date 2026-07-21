@@ -9,71 +9,65 @@ import StaffView from '@/views/staff/index.vue'
 import HomeView from '@/components/helper/homeView.vue'
 import Login from '@/components/container/connexion/login.vue'
 import password from '@/components/container/connexion/password.vue'
-import code from '@/components/container/connexion/code.vue'
 import reset from '@/components/container/connexion/reset.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-
     {
-      path:'/',
-      name:'Login',
-      component:Login,
+      path: '/login',
+      name: 'Login',
+      component: Login,
     },
-   {
-      path:'/password',
-      name:'password',
-      component:password,
+    {
+      path: '/password',
+      name: 'password',
+      component: password,
     },
-
-     {
-      path:'/code',
-      name:'code',
-      component:code,
+    {
+      path: '/reset',
+      name: 'reset',
+      component: reset,
     },
-     {
-      path:'/reset',
-      name:'reset',
-      component:reset,
-    },
-
-
-
     {
       path: '/',
       component: HomeView,
       children: [
         {
-          path: 'charts',
+          path: '/charts',
           name: 'charts',
           component: ChartsView,
         },
         {
-          path: 'rooms',
+          path: '/rooms',
           name: 'rooms',
           component: RoomsView,
         },
         {
-          path: 'reservation',
+          path: '/reservation',
           name: 'reservations',
           component: ReservationsView,
         },
         {
-          path: 'customers',
+          path: '/customers',
           name: 'customers',
           component: CustomersView,
         },
         {
-          path: 'service',
+          path: '/service',
           name: 'service',
           component: ServiceView,
         },
         {
-          path: 'staff',
+          path: '/staff',
           name: 'staff',
           component: StaffView,
         },
+        {
+      path: '/reservation/:id',
+      name: 'reservation-details',
+      component: () => import('@/components/container/reservation/details.vue'),
+    },
       ],
     },
   ],

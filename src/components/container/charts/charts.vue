@@ -2,38 +2,43 @@
   <div class="">
   <div class="min-h-screen w-full  p-6">
     <div class="space-y-6 max-w-7xl mx-auto">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 ">
-        <div
-          class="bg-white p-5 rounded-xl shadow border border-slate-100 flex flex-col justify-center transition-all duration-300 hover:border-amber-400 hover:shadow-md cursor-pointer min-h-[110px]"
-        >
-          <p class="text-3xl font-black text-black">28</p>
-          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Chambres occupées</p>
-        </div>
-        <div
-          class="bg-white p-5 rounded-xl shadow border border-slate-100 flex flex-col justify-center transition-all duration-300 hover:border-amber-400 hover:shadow-md cursor-pointer min-h-[110px]"
-        >
-          <p class="text-3xl font-black text-black">
-            42
-             </p>
-            <div class="text-xs font-bold text-slate-700">actifs / 150</div>
-          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Capacité globale (28.0%)</p>
-        </div>
-        <div
-          class="bg-white p-5 rounded-xl shadow border border-slate-100 flex flex-col justify-center transition-all duration-300 hover:border-amber-400 hover:shadow-md cursor-pointer min-h-[110px]"
-        >
-          <p class="text-3xl font-black text-black">14</p>
-          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Arrivées attendues</p>
-        </div>
-        <div
-          class="bg-white p-5 rounded-xl shadow border border-slate-100 flex flex-col justify-center transition-all duration-300 hover:border-amber-400 hover:shadow-md cursor-pointer min-h-[110px]"
-        >
-          <p class="text-3xl font-black text-black">9.4</p>
-          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Note moyenne avis</p>
-        </div>
+     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 ">
+  <div class="bg-white p-5 rounded-xl shadow border border-slate-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]">
+    <div class="flex justify-between items-start">
+      <p class="text-3xl font-black text-black">28</p>
+      <img :src="bed" alt="Bed icon" class="w-6 h-6 object-contain">
+    </div>
+    <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Chambres occupées</p>
+  </div>
+  <div class="bg-white p-5 rounded-xl shadow border border-slate-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]">
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="text-3xl font-black text-black">42</p>
+        <div class="text-xs font-bold text-slate-700">actifs / 150</div>
       </div>
+      <img :src="activitie" alt="activitie icon" class="w-6 h-6 object-contain">
+    </div>
+    <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Capacité globale (28.0%)</p>
+  </div>
+  <div class="bg-white p-5 rounded-xl shadow border border-slate-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]">
+    <div class="flex justify-between items-start">
+      <p class="text-3xl font-black text-black">14</p>
+      <img :src="rocket" alt="rocket icon" class="w-6 h-6 object-contain">
+    </div>
+    <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Arrivées attendues</p>
+  </div>
+  <div class="bg-white p-5 rounded-xl shadow border border-slate-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]">
+    <div class="flex justify-between items-start">
+      <p class="text-3xl font-black text-black">9.4</p>
+      <img :src="star" alt="Star icon" class="w-6 h-6 object-contain">
+    </div>
+    <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Note moyenne avis</p>
+  </div>
+</div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div
-          class="bg-white rounded-xl shadow p-5 border border-transparent transition-all duration-300 hover:border-amber-400 hover:shadow-md"
+          class="bg-white rounded-xl shadow p-5 border border-transparent transition-all duration-300  hover:shadow-md"
         >
           <h2 class="text-xl font-bold mb-5 text-slate-700">Statut des chambres (Aujourd'hui)</h2>
           <apexchart
@@ -45,7 +50,7 @@
           />
         </div>
         <div
-          class="bg-white rounded-xl shadow p-5 border border-transparent transition-all duration-300 hover:border-amber-400 hover:shadow-md"
+          class="bg-white rounded-xl shadow p-5 border border-transparent transition-all duration-300  hover:shadow-md"
         >
           <h2 class="text-xl font-bold mb-5 text-slate-700">Taux d'occupation par type de chambre</h2>
           <apexchart
@@ -58,7 +63,7 @@
         </div>
       </div>
       <div
-        class="bg-white rounded-xl shadow p-5 border border-transparent transition-all duration-300 hover:border-amber-400 hover:shadow-md"
+        class="bg-white rounded-xl shadow p-5 border border-transparent transition-all duration-300  hover:shadow-md"
       >
         <h2 class="text-xl font-bold mb-5 text-slate-700">Réservations mensuelles</h2>
         <apexchart
@@ -74,6 +79,10 @@
   </div>
 </template>
 <script setup lang="ts">
+import activitie from '@/assets/icon/activities.svg'
+import bed from '@/assets/icon/bed.svg'
+import rocket from '@/assets/icon/rocket.svg'
+import star from '@/assets/icon/star.svg'
 const roomPieSeries = [45, 35, 15, 5]
 const roomPieOptions = {
   chart: { id: 'room-pie-chart' },

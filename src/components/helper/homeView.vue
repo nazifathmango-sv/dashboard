@@ -11,7 +11,7 @@
               <TheHeader />
             </div>
             <br />
-            <div class="main-content my-32 2xl:my-24 2xl:p-10">
+            <div class="main-content my-32 2xl:my-14">
               <RouterView />
             </div>
           </div>

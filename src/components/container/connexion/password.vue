@@ -14,7 +14,7 @@
               class="w-full px-4 py-2 bg-gray-50 border border-gray-400 rounded-lg text-sm focus:outline-none focus:border-gray-400"
             />
           </div>
-          <RouterLink to="/code">
+          <RouterLink to="/reset">
           <button
             type="submit"
             class="w-full py-3 bg-gray-800 text-white font-medium rounded-full transition duration-200 shadow-md text-sm hover:bg-gray-400 hover:text-black border border-transparent hover:border-gray-400 cursor-pointerhover:scale-105 active:scale-95 "

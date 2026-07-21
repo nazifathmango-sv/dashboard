@@ -37,7 +37,7 @@ const menu = [
   {
     name:"Tableau de bord",
     icon:tableau,
-    path:"/"
+    path:"/charts"
   },
 {
     name:"Clients",
