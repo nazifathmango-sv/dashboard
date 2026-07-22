@@ -1,19 +1,11 @@
 <template>
-  <div v-if="reservation" class="p-8 max-w-7xl mx-auto bg-[#f8f8f6] min-h-screen rounded-3xl">
-    <div class="flex justify-between items-center mb-10">
-      <div>
-        <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">
-          Détails de la réservation
-        </h1>
-        <p class="text-gray-500 mt-2">Gestion des informations client et du séjour.</p>
-      </div>
-      <button
-        @click="router.back()"
-        class="px-6 py-3 bg-gray-900 text-white rounded-xl shadow-sm hover:bg-gray-800 hover:shadow-lg transition-all duration-300"
-      >
-        Retour
-      </button>
-    </div>
+  <div v-if="reservation" class="p-8 max-w-7xl mx-auto bg-gray-50/50 min-h-screen rounded-3xl">
+    <PageHeader
+      title="Détails de la réservation"
+      subtitle="Gestion des informations client et du séjour."
+      back-to
+      @back="router.back()"
+    />
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
       <div
         class="bg-white rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300"
@@ -121,29 +113,23 @@
           ></textarea>
         </div>
         <div class="flex justify-end gap-4 mt-10">
-          <button
-            class="px-7 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-          >
-            Supprimer
-          </button>
-
-          <button
-            class="px-7 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-          >
-            Modifier
-          </button>
+          <BaseButton variant="danger">Supprimer</BaseButton>
+          <BaseButton variant="primary">Modifier</BaseButton>
         </div>
       </div>
     </div>
   </div>
 
   <div v-else class="flex items-center justify-center min-h-screen">
-    <p class="text-gray-500 text-xl">Réservation introuvable.</p>
+    <EmptyState title="Réservation introuvable" description="Cette réservation n'existe pas ou a été supprimée." />
   </div>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import PageHeader from '@/components/ui/PageHeader.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import EmptyState from '@/components/ui/EmptyState.vue'
 
 const route = useRoute()
 const router = useRouter()

@@ -1,21 +1,10 @@
 <template>
-  <div class="HomeView">
-    <div class="begin">
-      <div class="content">
-        <div class="flex h-screen w-full overflow-hidden bg-slate-100">
-          <div class="sidebar">
-            <TheSidebar />
-          </div>
-          <div class="bg- w-full h-screen overflow-y-scroll">
-            <div class="header fixed z-50 ">
-              <TheHeader />
-            </div>
-            <br />
-            <div class="main-content my-32 2xl:my-14">
-              <RouterView />
-            </div>
-          </div>
-        </div>
+  <div class="flex h-screen w-full overflow-hidden bg-slate-100">
+    <TheSidebar />
+    <div class="w-full h-screen overflow-y-auto">
+      <TheHeader class="sticky top-0 z-50" />
+      <div class="main-content">
+        <RouterView />
       </div>
     </div>
   </div>
@@ -24,8 +13,3 @@
 import TheSidebar from '@/components/helper/sideBar.vue'
 import TheHeader from '@/components/helper/header.vue'
 </script>
-<style scoped>
-.header {
-  width: -webkit-fill-available;
-}
-</style>
