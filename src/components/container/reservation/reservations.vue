@@ -26,7 +26,7 @@
       <div>Type</div>
       <div>Date début</div>
       <div>Date fin</div>
-      <div class="text-right">Actions</div>
+      <div class="text-center">Actions</div>
     </div>
     <div class="bg-white rounded-b-2xl shadow-sm overflow-hidden">
       <div
@@ -41,10 +41,6 @@
           >
             {{ reservation.name }}
           </div>
-
-          <p class="text-4xs text-gray-400 hidden md:block">
-            {{ reservation.email }} | {{ reservation.phone }}
-          </p>
         </div>
         <div>
           <div class="px-3 py-1 text-xs rounded-lg bg-blue-50 text-blue-700 border border-blue-100">
@@ -60,14 +56,15 @@
         <div class="flex justify-center items-center gap-3">
           <button
             @click="editReservation(reservation, index)"
-            class="flex items-center justify-center w-9 h-9 rounded-lg transition cursor-pointer"
+            class="flex items-center justify-center w-9 h-9 rounded-lg transition cursor-pointer hover:bg-gray-100"
             title="Modifier"
           >
             <img :src="Compose" alt="Modifier" class="w-5 h-5" />
           </button>
+
           <button
             @click="deleteReservation(index)"
-            class="flex items-center justify-center w-9 h-9 rounded-lg transition cursor-pointer"
+            class="flex items-center justify-center w-9 h-9 rounded-lg transition cursor-pointer hover:bg-gray-100"
             title="Supprimer"
           >
             <img :src="Bin" alt="Supprimer" class="w-5 h-5" />
@@ -208,8 +205,6 @@ const router = useRouter()
 interface Reservation {
   id: number
   name: string
-  phone: string
-  email: string
   identityCard: string
   country: string
   type: string
@@ -224,8 +219,6 @@ const reservations = ref<Reservation[]>([
   {
     id: 1,
     name: 'MANGO Nazifath',
-    phone: '+229 01 60 00 00 00',
-    email: 'nazifath@example.com',
     identityCard: 'B1234567',
     country: 'Bénin',
     type: 'Chambre Luxe',
@@ -235,8 +228,6 @@ const reservations = ref<Reservation[]>([
   {
     id: 2,
     name: 'KODJO Jean',
-    phone: '+229 01 61 00 00 00',
-    email: 'jean@example.com',
     identityCard: 'A7654321',
     country: 'Togo',
     type: 'Salle de fête',
@@ -246,8 +237,6 @@ const reservations = ref<Reservation[]>([
   {
     id: 3,
     name: 'KODJO Jean',
-    phone: '+229 01 61 00 00 00',
-    email: 'jean@example.com',
     identityCard: 'A7654321',
     country: 'Togo',
     type: 'Restaurants',
@@ -258,8 +247,6 @@ const reservations = ref<Reservation[]>([
 const emptyForm = (): Reservation => ({
   id: 0,
   name: '',
-  phone: '',
-  email: '',
   identityCard: '',
   country: '',
   type: '',
@@ -308,9 +295,9 @@ const deleteReservation = (index: number) => {
 const openDetails = (reservation: Reservation) => {
   router.push({
     name: 'reservation-details',
-    params:{
-      id: reservation.id
-    }
+    params: {
+      id: reservation.id,
+    },
   })
 }
 </script>

@@ -10,7 +10,7 @@ import HomeView from '@/components/helper/homeView.vue'
 import Login from '@/components/container/connexion/login.vue'
 import password from '@/components/container/connexion/password.vue'
 import reset from '@/components/container/connexion/reset.vue'
-
+import AdminView from '@/views/admin/index.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -64,10 +64,16 @@ const router = createRouter({
           component: StaffView,
         },
         {
+          path: '/admin',
+          name: 'admin',
+          component: AdminView,
+        },
+        {
       path: '/reservation/:id',
       name: 'reservation-details',
       component: () => import('@/components/container/reservation/details.vue'),
     },
+
       ],
     },
   ],
