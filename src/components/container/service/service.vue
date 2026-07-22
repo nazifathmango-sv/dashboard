@@ -1,48 +1,30 @@
 <template>
-   <div class="bg-white rounded-xl shadow p-5">
-    <h2 class="text-xl font-bold mb-5">
-      Réservations mensuelles
-    </h2>
-    <apexchart
-      width="100%"
-      height="350"
-      type="bar"
-      :options="chartOptions"
-      :series="series"
-    />
+  <div class="bg-white rounded-xl shadow p-5">
+    <h2 class="text-xl font-bold mb-5">Services de l'hôtel</h2>
+
+    <nav class="max-w-xs">
+      <button
+        v-for="service in services"
+        :key="service.id"
+        class="w-full text-left px-4 py-3 rounded-lg font-medium text-gray-700 hover:bg-amber-50 hover:text-gray-900 transition-colors border-b border-gray-100 last:border-b-0"
+        @click="handleClick(service)"
+      >
+        {{ service.titre }}
+      </button>
+    </nav>
   </div>
 </template>
 <script setup lang="ts">
-const chartOptions = {
-  chart:{
-    id:"reservation-chart"
-  },
-  xaxis:{
-    categories:[
-      "Jan",
-      "Fév",
-      "Mars",
-      "Avril",
-      "Mai",
-      "Juin"
-    ]
-  },
-  colors:[
-    "#fbbf24"
-  ]
-}
-const series = [
+import { useRouter } from 'vue-router'
+import { services, type Service } from '@/data/services'
 
-  {
-    name:"Réservations",
-    data:[
-      30,
-      45,
-      35,
-      60,
-      80,
-      70
-    ]
+const router = useRouter()
+
+const handleClick = (service: Service) => {
+  if (service.titre === 'Chambres') {
+    router.push('/rooms')
+  } else {
+    router.push(`/service/${service.slug}`)
   }
-]
+}
 </script>

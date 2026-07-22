@@ -69,11 +69,15 @@ const router = createRouter({
           component: AdminView,
         },
         {
-      path: '/reservation/:id',
-      name: 'reservation-details',
-      component: () => import('@/components/container/reservation/details.vue'),
-    },
-
+          path: '/reservation/:id',
+          name: 'reservation-details',
+          component: () => import('@/components/container/reservation/details.vue'),
+        },
+        {
+          path: '/service/:slug',
+          name: 'service-details',
+          component: () => import('@/views/serviceDetail/index.vue'),
+        },
       ],
     },
   ],
