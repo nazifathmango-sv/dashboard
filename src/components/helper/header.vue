@@ -59,6 +59,9 @@ const titles: Record<string, string> = {
   customers: 'Customers',
   service: 'Service',
   staff: 'Staff',
+  'service-details': 'Service',
+  'reservation-details': 'Détails de la réservation',
+  'customer-details': 'Détails du client',
 }
 const currentTitle = computed(() => {
   return titles[route.name as string] || 'charts'
