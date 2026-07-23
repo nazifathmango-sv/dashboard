@@ -1,19 +1,22 @@
 <template>
-  <div class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl">
+  <div class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader title="Réservations" subtitle="Gestion des réservations clients.">
       <template #actions>
-        <BaseButton @click="openAddPopup">Nouvelle réservation</BaseButton>
+        <BaseButton @click="openAddPopup">
+          <Icon name="plus" class="w-4 h-4" />
+          Nouvelle réservation
+        </BaseButton>
       </template>
     </PageHeader>
 
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <PageCard class="mb-6">
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Rechercher par nom ou type..."
         class="w-full md:w-96 px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:bg-white transition"
       />
-    </div>
+    </PageCard>
 
     <EmptyState
       v-if="filteredReservations.length === 0"
@@ -23,21 +26,45 @@
 
     <template v-else>
       <div
-        class="hidden md:grid grid-cols-5 gap-6 px-6 py-4 bg-white border-b font-semibold text-sm text-gray-500 uppercase rounded-t-2xl"
+        class="hidden md:grid grid-cols-6 gap-3 px-6 py-4 bg-white border-b font-semibold text-sm text-gray-500 uppercase rounded-t-2xl"
       >
-        <div>Nom et prénoms</div>
-        <div>Type</div>
-        <div>Date début</div>
-        <div>Date fin</div>
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('name')">
+          Nom et prénoms
+          <SortIcon :active="sortKey === 'name'" :direction="sortDirection" />
+        </button>
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('type')">
+          Type
+          <SortIcon :active="sortKey === 'type'" :direction="sortDirection" />
+        </button>
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('dateDebut')">
+          Date début
+          <SortIcon :active="sortKey === 'dateDebut'" :direction="sortDirection" />
+        </button>
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('dateFin')">
+          Date fin
+          <SortIcon :active="sortKey === 'dateFin'" :direction="sortDirection" />
+        </button>
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('stayStatus')">
+          Statut séjour
+          <SortIcon :active="sortKey === 'stayStatus'" :direction="sortDirection" />
+        </button>
         <div class="text-center">Actions</div>
       </div>
-      <div class="bg-white rounded-b-2xl shadow-sm overflow-hidden">
+      <TransitionGroup
+        tag="div"
+        name="list-row"
+        class="bg-white overflow-hidden"
+        :class="totalPages > 1 ? '' : 'rounded-b-2xl shadow-sm'"
+      >
         <div
-          v-for="(reservation, index) in filteredReservations"
+          v-for="(reservation, index) in paginatedReservations"
           :key="reservation.id"
-          class="p-5 md:grid md:grid-cols-5 gap-6 items-center border-b hover:bg-gray-50"
+          :style="{ transitionDelay: `${Math.min(index * 20, 200)}ms` }"
+          class="p-5 md:grid md:grid-cols-6 gap-3 items-center border-b border-l-4 hover:bg-gray-50 hover:shadow-sm transition-colors duration-150"
+          :class="rowBorderClass(reservation)"
         >
-          <div>
+          <div class="flex items-center gap-3">
+            <Avatar :name="reservation.name" />
             <div
               @click="openDetails(reservation)"
               class="text-gray-900 font-medium cursor-pointer hover:text-gray-600 transition"
@@ -54,132 +81,167 @@
           <div class="text-gray-600 text-sm">
             {{ reservation.dateFin }}
           </div>
-          <div class="flex md:justify-center items-center gap-3 mt-3 md:mt-0">
-            <BaseButton size="sm" variant="secondary" @click="editReservation(reservation, index)">
-              Modifier
+          <div>
+            <Badge :tone="stayStatusTone(reservation.stayStatus)">{{ reservation.stayStatus }}</Badge>
+          </div>
+          <div class="flex md:justify-center items-center gap-2 mt-3 md:mt-0">
+            <BaseButton size="sm" variant="secondary" title="Modifier" @click="editReservation(reservation)">
+              <Icon name="edit" class="w-4 h-4" />
             </BaseButton>
-            <BaseButton size="sm" variant="danger" @click="confirmDelete(index)">Supprimer</BaseButton>
+            <BaseButton size="sm" variant="danger" title="Supprimer" @click="confirmDelete(reservation.id)">
+              <Icon name="trash" class="w-4 h-4" />
+            </BaseButton>
           </div>
         </div>
-      </div>
+      </TransitionGroup>
+      <Pagination v-model:current-page="currentPage" :total-pages="totalPages" />
     </template>
 
-    <div
-      v-if="showPopup"
-      @click="closePopup"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-    >
-      <div
-        @click.stop
-        class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]"
-      >
-        <h3 class="text-xl font-bold text-gray-800 text-center mb-6">
-          {{ isEditing ? 'Modifier la réservation' : "Fiche d'enregistrement client" }}
-        </h3>
-        <form @submit.prevent="saveReservation" class="space-y-4">
-          <FormField v-model="form.name" label="Nom et prénoms" required placeholder="MANGO Nazifath" />
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField v-model="form.phone" type="tel" label="Téléphone" required placeholder="+229 01 00 00 00 00" />
-            <FormField v-model="form.email" type="email" label="Adresse Email" required placeholder="exemple@gmail.com" />
+    <Modal v-model="showPopup" size="lg">
+      <h3 class="text-xl font-bold text-gray-800 text-center mb-6">
+        {{ isEditing ? 'Modifier la réservation' : "Fiche d'enregistrement client" }}
+      </h3>
+      <form @submit.prevent="saveReservation" class="space-y-6">
+        <div>
+          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">Client</h4>
+          <div class="space-y-4">
+            <FormField
+              v-model="form.name"
+              label="Nom et prénoms"
+              placeholder="MANGO Nazifath"
+              :invalid="!!errors.name"
+              :error="errors.name"
+            />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                v-model="form.phone"
+                type="tel"
+                label="Téléphone"
+                placeholder="+229 01 00 00 00 00"
+                :invalid="!!errors.phone"
+                :error="errors.phone"
+              />
+              <FormField
+                v-model="form.email"
+                type="email"
+                label="Adresse Email"
+                placeholder="exemple@gmail.com"
+                :invalid="!!errors.email"
+                :error="errors.email"
+              />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                v-model="form.identityCard"
+                label="N° Pièce d'identité"
+                placeholder="B1234567"
+                :invalid="!!errors.identityCard"
+                :error="errors.identityCard"
+              />
+              <FormField
+                v-model="form.country"
+                label="Pays de résidence"
+                placeholder="Bénin"
+                :invalid="!!errors.country"
+                :error="errors.country"
+              />
+            </div>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField v-model="form.identityCard" label="N° Pièce d'identité" required placeholder="B1234567" />
-            <FormField v-model="form.country" label="Pays de résidence" required placeholder="Bénin" />
-          </div>
-          <FormField v-model="form.type" label="Type de réservation" required placeholder="Chambre / Salle de fête / Spa" />
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField v-model="form.dateDebut" type="date" label="Date début" required />
-            <FormField v-model="form.dateFin" type="date" label="Date fin" required />
-          </div>
-          <div class="flex justify-end gap-3 pt-5">
-            <BaseButton type="button" variant="secondary" @click="closePopup">Annuler</BaseButton>
-            <BaseButton type="submit">
-              {{ isEditing ? 'Confirmer la modification' : 'Enregistrer & Réserver' }}
-            </BaseButton>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div
-      v-if="deleteIndex !== null"
-      @click="cancelDelete"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-    >
-      <div @click.stop class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-sm mx-4">
-        <h3 class="text-lg font-bold text-gray-800 mb-2">Supprimer la réservation ?</h3>
-        <p class="text-sm text-gray-500 mb-6">Cette action est irréversible.</p>
-        <div class="flex justify-end gap-3">
-          <BaseButton variant="secondary" @click="cancelDelete">Annuler</BaseButton>
-          <BaseButton variant="danger" @click="deleteReservation">Supprimer</BaseButton>
         </div>
+
+        <div>
+          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">Séjour</h4>
+          <div class="space-y-4">
+            <FormField
+              v-model="form.type"
+              label="Type de réservation"
+              placeholder="Chambre / Salle de fête / Spa"
+              :invalid="!!errors.type"
+              :error="errors.type"
+            />
+            <SelectField v-model="roomIdField" label="Chambre associée (optionnel)">
+              <option value="">Aucune (prestation hors chambre)</option>
+              <option v-for="room in rooms" :key="room.id" :value="room.id">{{ room.titre }}</option>
+            </SelectField>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                v-model="form.dateDebut"
+                type="date"
+                label="Date début"
+                :invalid="!!errors.dateDebut"
+                :error="errors.dateDebut"
+              />
+              <FormField
+                v-model="form.dateFin"
+                type="date"
+                label="Date fin"
+                :invalid="!!errors.dateFin"
+                :error="errors.dateFin"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <BaseButton type="button" variant="secondary" @click="closePopup">Annuler</BaseButton>
+          <BaseButton type="submit">
+            {{ isEditing ? 'Confirmer la modification' : 'Enregistrer & Réserver' }}
+          </BaseButton>
+        </div>
+      </form>
+    </Modal>
+
+    <Modal :model-value="deleteId !== null" size="sm" @update:model-value="cancelDelete">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">Supprimer la réservation ?</h3>
+      <p class="text-sm text-gray-500 mb-6">Cette action est irréversible.</p>
+      <div class="flex justify-end gap-3">
+        <BaseButton variant="secondary" @click="cancelDelete">Annuler</BaseButton>
+        <BaseButton variant="danger" @click="deleteReservation">Supprimer</BaseButton>
       </div>
-    </div>
+    </Modal>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useReservationsStore } from '@/stores/reservations'
+import { useRoomsStore } from '@/stores/rooms'
+import type { Reservation, StayStatus } from '@/data/reservations'
 import PageHeader from '@/components/ui/PageHeader.vue'
+import PageCard from '@/components/ui/PageCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import FormField from '@/components/ui/FormField.vue'
+import SelectField from '@/components/ui/SelectField.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import Badge from '@/components/ui/Badge.vue'
+import Modal from '@/components/ui/Modal.vue'
+import Icon from '@/components/ui/Icon.vue'
+import Avatar from '@/components/ui/Avatar.vue'
+import Pagination from '@/components/ui/Pagination.vue'
+import SortIcon from '@/components/ui/SortIcon.vue'
 
 const router = useRouter()
-interface Reservation {
-  id: number
-  name: string
-  phone: string
-  email: string
-  identityCard: string
-  country: string
-  type: string
-  dateDebut: string
-  dateFin: string
-}
+const reservationsStore = useReservationsStore()
+const { reservations } = storeToRefs(reservationsStore)
+const { rooms } = storeToRefs(useRoomsStore())
+
+const PAGE_SIZE = 10
+
 const searchQuery = ref('')
 const showPopup = ref(false)
 const isEditing = ref(false)
-const editIndex = ref<number | null>(null)
-const deleteIndex = ref<number | null>(null)
-const reservations = ref<Reservation[]>([
-  {
-    id: 1,
-    name: 'MANGO Nazifath',
-    phone: '+229 01 60 00 00 00',
-    email: 'nazifath@example.com',
-    identityCard: 'B1234567',
-    country: 'Bénin',
-    type: 'Chambre Luxe',
-    dateDebut: '2026-07-20',
-    dateFin: '2026-07-25',
-  },
-  {
-    id: 2,
-    name: 'KODJO Jean',
-    phone: '+229 01 61 00 00 00',
-    email: 'jean@example.com',
-    identityCard: 'A7654321',
-    country: 'Togo',
-    type: 'Salle de fête',
-    dateDebut: '2026-08-01',
-    dateFin: '2026-08-02',
-  },
-  {
-    id: 3,
-    name: 'KODJO Jean',
-    phone: '+229 01 61 00 00 00',
-    email: 'jean@example.com',
-    identityCard: 'A7654321',
-    country: 'Togo',
-    type: 'Restaurants',
-    dateDebut: '2026-08-01',
-    dateFin: '2026-08-02',
-  },
-])
-const emptyForm = (): Reservation => ({
-  id: 0,
+const editId = ref<number | null>(null)
+const deleteId = ref<number | null>(null)
+const roomIdField = ref<number | ''>('')
+const errors = ref<Record<string, string>>({})
+const sortKey = ref<'name' | 'type' | 'dateDebut' | 'dateFin' | 'stayStatus'>('name')
+const sortDirection = ref<'asc' | 'desc'>('asc')
+const currentPage = ref(1)
+
+type ReservationFormData = Omit<Reservation, 'id' | 'stayStatus'>
+
+const emptyForm = (): ReservationFormData => ({
   name: '',
   phone: '',
   email: '',
@@ -189,52 +251,129 @@ const emptyForm = (): Reservation => ({
   dateDebut: '',
   dateFin: '',
 })
-const form = ref<Reservation>(emptyForm())
+const form = ref<ReservationFormData>(emptyForm())
+
 const filteredReservations = computed(() => {
-  return reservations.value.filter((reservation) => {
-    const search = searchQuery.value.toLowerCase()
-    return (
-      reservation.name.toLowerCase().includes(search) ||
-      reservation.type.toLowerCase().includes(search)
-    )
-  })
+  const search = searchQuery.value.toLowerCase()
+  return reservations.value.filter(
+    (reservation) =>
+      reservation.name.toLowerCase().includes(search) || reservation.type.toLowerCase().includes(search),
+  )
 })
+
+const sortedReservations = computed(() => {
+  const dir = sortDirection.value === 'asc' ? 1 : -1
+  return [...filteredReservations.value].sort(
+    (a, b) => String(a[sortKey.value]).localeCompare(String(b[sortKey.value]), 'fr') * dir,
+  )
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(sortedReservations.value.length / PAGE_SIZE)))
+
+const paginatedReservations = computed(() =>
+  sortedReservations.value.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE),
+)
+
+watch(searchQuery, () => {
+  currentPage.value = 1
+})
+
+function toggleSort(key: typeof sortKey.value) {
+  if (sortKey.value === key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortKey.value = key
+    sortDirection.value = 'asc'
+  }
+}
+
+function stayStatusTone(status: StayStatus) {
+  switch (status) {
+    case 'Check-in':
+      return 'blue'
+    case 'En cours':
+      return 'green'
+    case 'Check-out':
+      return 'amber'
+    case 'À venir':
+    default:
+      return 'gray'
+  }
+}
+
+function rowBorderClass(reservation: Reservation) {
+  switch (reservation.stayStatus) {
+    case 'Check-in':
+    case 'En cours':
+      return 'border-green-500'
+    case 'Check-out':
+      return 'border-amber-500'
+    case 'À venir':
+    default:
+      return 'border-gray-200'
+  }
+}
+
+function validate(): boolean {
+  errors.value = {}
+  const requiredFields: Array<[keyof ReservationFormData, string]> = [
+    ['name', 'Le nom est requis.'],
+    ['phone', 'Le téléphone est requis.'],
+    ['email', "L'email est requis."],
+    ['identityCard', 'La pièce d’identité est requise.'],
+    ['country', 'Le pays est requis.'],
+    ['type', 'Le type de réservation est requis.'],
+    ['dateDebut', 'La date de début est requise.'],
+    ['dateFin', 'La date de fin est requise.'],
+  ]
+  for (const [field, message] of requiredFields) {
+    if (!form.value[field]?.toString().trim()) {
+      errors.value[field] = message
+    }
+  }
+  return Object.keys(errors.value).length === 0
+}
+
 const openAddPopup = () => {
   isEditing.value = false
-  editIndex.value = null
+  editId.value = null
   form.value = emptyForm()
+  roomIdField.value = ''
+  errors.value = {}
   showPopup.value = true
 }
-const editReservation = (reservation: Reservation, index: number) => {
+const editReservation = (reservation: Reservation) => {
   isEditing.value = true
-  editIndex.value = index
-  form.value = { ...reservation }
+  editId.value = reservation.id
+  const { id, stayStatus, ...rest } = reservation
+  form.value = { ...rest }
+  roomIdField.value = reservation.roomId ?? ''
+  errors.value = {}
   showPopup.value = true
 }
 const closePopup = () => {
   showPopup.value = false
 }
 const saveReservation = () => {
-  if (isEditing.value && editIndex.value !== null) {
-    reservations.value[editIndex.value] = { ...form.value }
+  if (!validate()) return
+  const payload = { ...form.value, roomId: roomIdField.value === '' ? undefined : Number(roomIdField.value) }
+  if (isEditing.value && editId.value !== null) {
+    reservationsStore.update(editId.value, payload)
   } else {
-    reservations.value.push({
-      ...form.value,
-      id: reservations.value.length + 1,
-    })
+    reservationsStore.add(payload)
   }
   closePopup()
 }
-const confirmDelete = (index: number) => {
-  deleteIndex.value = index
+const confirmDelete = (id: number) => {
+  deleteId.value = id
 }
 const cancelDelete = () => {
-  deleteIndex.value = null
+  deleteId.value = null
 }
 const deleteReservation = () => {
-  if (deleteIndex.value !== null) {
-    reservations.value.splice(deleteIndex.value, 1)
-    deleteIndex.value = null
+  if (deleteId.value !== null) {
+    reservationsStore.remove(deleteId.value)
+    deleteId.value = null
   }
 }
 const openDetails = (reservation: Reservation) => {
@@ -246,3 +385,14 @@ const openDetails = (reservation: Reservation) => {
   })
 }
 </script>
+<style scoped>
+.list-row-enter-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.list-row-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="service" class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl">
+  <div v-if="service" class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader :title="service.titre" back-to @back="router.back()" />
 
     <div class="relative h-72 md:h-96 w-full rounded-3xl overflow-hidden mb-8">

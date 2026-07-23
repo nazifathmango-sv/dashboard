@@ -1,6 +1,5 @@
 // Import standard de Firebase
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 
 // ÉTAPE INDISPENSABLE : Importer Firestore (base de données) et Authentication !
 import { getFirestore } from "firebase/firestore";
@@ -19,7 +18,6 @@ const firebaseConfig = {
 
 // Initialisation de Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 // ÉTAPE INDISPENSABLE : Créer et EXPORTER la base de données et l'authentification pour Vue.js
 export const db = getFirestore(app);

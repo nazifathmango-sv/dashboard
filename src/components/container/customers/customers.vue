@@ -1,22 +1,25 @@
 <template>
-  <div class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl">
+  <div class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader title="Clients" subtitle="Gestion des clients de l'hôtel.">
       <template #actions>
-        <BaseButton @click="openAddPopup">Nouveau client</BaseButton>
+        <BaseButton @click="openAddPopup">
+          <Icon name="plus" class="w-4 h-4" />
+          Nouveau client
+        </BaseButton>
       </template>
     </PageHeader>
 
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
+    <PageCard class="mb-6">
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Rechercher par nom ou pays..."
         class="w-full md:w-96 px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:bg-white transition"
       />
-    </div>
+    </PageCard>
 
     <EmptyState
-      v-if="filteredCustomers.length === 0"
+      v-if="filteredClients.length === 0"
       title="Aucun client trouvé"
       description="Essayez une autre recherche ou ajoutez un nouveau client."
     />
@@ -25,145 +28,345 @@
       <div
         class="hidden md:grid grid-cols-4 gap-6 px-6 py-4 bg-white border-b font-semibold text-sm text-gray-500 uppercase rounded-t-2xl"
       >
-        <div>Nom et prénoms</div>
-        <div>Téléphone</div>
-        <div>Email</div>
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('nom')">
+          Nom et prénoms
+          <SortIcon :active="sortKey === 'nom'" :direction="sortDirection" />
+        </button>
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('telephone')">
+          Téléphone
+          <SortIcon :active="sortKey === 'telephone'" :direction="sortDirection" />
+        </button>
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('nationalite')">
+          Nationalité
+          <SortIcon :active="sortKey === 'nationalite'" :direction="sortDirection" />
+        </button>
         <div class="text-center">Actions</div>
       </div>
-      <div class="bg-white rounded-b-2xl shadow-sm overflow-hidden">
+      <TransitionGroup
+        tag="div"
+        name="list-row"
+        class="bg-white overflow-hidden"
+        :class="totalPages > 1 ? '' : 'rounded-b-2xl shadow-sm'"
+      >
         <div
-          v-for="(customer, index) in filteredCustomers"
-          :key="customer.id"
-          class="p-5 md:grid md:grid-cols-4 gap-6 items-center border-b hover:bg-gray-50"
+          v-for="(client, index) in paginatedClients"
+          :key="client.id"
+          :style="{ transitionDelay: `${Math.min(index * 20, 200)}ms` }"
+          class="p-5 md:grid md:grid-cols-4 gap-6 items-center border-b hover:bg-gray-50 hover:shadow-sm transition-colors duration-150"
         >
-          <div>
-            <div class="text-gray-900 font-medium">
-              {{ customer.name }}
+          <div class="flex items-center gap-3">
+            <Avatar :name="`${client.nom} ${client.prenom}`" />
+            <div>
+              <div
+                @click="openDetails(client)"
+                class="text-gray-900 font-medium cursor-pointer hover:text-gray-600 transition"
+              >
+                {{ client.nom }} {{ client.prenom }}
+              </div>
+              <Badge tone="gray" class="mt-1">{{ client.paysProvenance }}</Badge>
             </div>
-            <Badge tone="gray" class="mt-1">{{ customer.country }}</Badge>
           </div>
           <div class="text-gray-600 text-sm mt-2 md:mt-0">
-            {{ customer.phone }}
+            {{ client.telephone }}
           </div>
           <div class="text-gray-600 text-sm mt-2 md:mt-0">
-            {{ customer.email }}
+            {{ client.nationalite }}
           </div>
           <div class="flex md:justify-center items-center gap-3 mt-3 md:mt-0">
-            <BaseButton size="sm" variant="secondary" @click="editCustomer(customer, index)">Modifier</BaseButton>
-            <BaseButton size="sm" variant="danger" @click="confirmDelete(index)">Supprimer</BaseButton>
+            <BaseButton size="sm" variant="secondary" title="Modifier" @click="editClient(client)">
+              <Icon name="edit" class="w-4 h-4" />
+            </BaseButton>
+            <BaseButton size="sm" variant="danger" title="Supprimer" @click="confirmDelete(client.id)">
+              <Icon name="trash" class="w-4 h-4" />
+            </BaseButton>
           </div>
         </div>
-      </div>
+      </TransitionGroup>
+      <Pagination v-model:current-page="currentPage" :total-pages="totalPages" />
     </template>
 
-    <div
-      v-if="showPopup"
-      @click="closePopup"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-    >
-      <div
-        @click.stop
-        class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-y-auto max-h-[90vh]"
-      >
-        <h3 class="text-xl font-bold text-gray-800 text-center mb-6">
-          {{ isEditing ? 'Modifier le client' : 'Nouveau client' }}
-        </h3>
-        <form @submit.prevent="saveCustomer" class="space-y-4">
-          <FormField v-model="form.name" label="Nom et prénoms" required placeholder="MANGO Nazifath" />
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormField v-model="form.phone" type="tel" label="Téléphone" required placeholder="+229 01 00 00 00 00" />
-            <FormField v-model="form.email" type="email" label="Adresse Email" required placeholder="exemple@gmail.com" />
+    <Modal v-model="showPopup" size="lg">
+      <h3 class="text-xl font-bold text-gray-800 text-center mb-6">
+        {{ isEditing ? 'Modifier le client' : 'Nouveau client' }}
+      </h3>
+      <form @submit.prevent="saveClient" class="space-y-6">
+        <div>
+          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">Identité</h4>
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                v-model="form.nom"
+                label="Nom"
+                placeholder="MANGO"
+                :invalid="!!errors.nom"
+                :error="errors.nom"
+              />
+              <FormField
+                v-model="form.prenom"
+                label="Prénom"
+                placeholder="Nazifath"
+                :invalid="!!errors.prenom"
+                :error="errors.prenom"
+              />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <SelectField v-model="form.sexe" label="Sexe">
+                <option value="F">Féminin</option>
+                <option value="M">Masculin</option>
+              </SelectField>
+              <FormField
+                v-model="form.dateNaissance"
+                type="date"
+                label="Date de naissance"
+                :invalid="!!errors.dateNaissance"
+                :error="errors.dateNaissance"
+              />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                v-model="form.lieuNaissance"
+                label="Lieu de naissance"
+                placeholder="Cotonou"
+                :invalid="!!errors.lieuNaissance"
+                :error="errors.lieuNaissance"
+              />
+              <FormField
+                v-model="form.nationalite"
+                label="Nationalité"
+                placeholder="Béninoise"
+                :invalid="!!errors.nationalite"
+                :error="errors.nationalite"
+              />
+            </div>
           </div>
-          <FormField v-model="form.country" label="Pays de résidence" required placeholder="Bénin" />
-          <div class="flex justify-end gap-3 pt-5">
-            <BaseButton type="button" variant="secondary" @click="closePopup">Annuler</BaseButton>
-            <BaseButton type="submit">{{ isEditing ? 'Confirmer la modification' : 'Enregistrer' }}</BaseButton>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div
-      v-if="deleteIndex !== null"
-      @click="cancelDelete"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
-    >
-      <div @click.stop class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-sm mx-4">
-        <h3 class="text-lg font-bold text-gray-800 mb-2">Supprimer ce client ?</h3>
-        <p class="text-sm text-gray-500 mb-6">Cette action est irréversible.</p>
-        <div class="flex justify-end gap-3">
-          <BaseButton variant="secondary" @click="cancelDelete">Annuler</BaseButton>
-          <BaseButton variant="danger" @click="deleteCustomer">Supprimer</BaseButton>
         </div>
+
+        <div>
+          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">Contact</h4>
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                v-model="form.phone"
+                type="tel"
+                label="Téléphone"
+                placeholder="+229 01 00 00 00 00"
+                :invalid="!!errors.phone"
+                :error="errors.phone"
+              />
+              <FormField v-model="form.email" type="email" label="Adresse Email (optionnel)" placeholder="exemple@gmail.com" />
+            </div>
+            <FormField
+              v-model="form.adresse"
+              label="Adresse"
+              placeholder="Fidjrossè"
+              :invalid="!!errors.adresse"
+              :error="errors.adresse"
+            />
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">Documents</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormField
+              v-model="form.typePiece"
+              label="Type de pièce d'identité"
+              placeholder="Passeport"
+              :invalid="!!errors.typePiece"
+              :error="errors.typePiece"
+            />
+            <FormField
+              v-model="form.paysProvenance"
+              label="Pays de provenance"
+              placeholder="Bénin"
+              :invalid="!!errors.paysProvenance"
+              :error="errors.paysProvenance"
+            />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <BaseButton type="button" variant="secondary" @click="closePopup">Annuler</BaseButton>
+          <BaseButton type="submit">{{ isEditing ? 'Confirmer la modification' : 'Enregistrer' }}</BaseButton>
+        </div>
+      </form>
+    </Modal>
+
+    <Modal :model-value="deleteId !== null" size="sm" @update:model-value="cancelDelete">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">Supprimer ce client ?</h3>
+      <p class="text-sm text-gray-500 mb-6">Cette action est irréversible.</p>
+      <div class="flex justify-end gap-3">
+        <BaseButton variant="secondary" @click="cancelDelete">Annuler</BaseButton>
+        <BaseButton variant="danger" @click="deleteClient">Supprimer</BaseButton>
       </div>
-    </div>
+    </Modal>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { customers as initialCustomers, type Customer } from '@/data/customers'
+import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useClientsStore } from '@/stores/clients'
+import type { Client } from '@/data/clients'
 import PageHeader from '@/components/ui/PageHeader.vue'
+import PageCard from '@/components/ui/PageCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import FormField from '@/components/ui/FormField.vue'
+import SelectField from '@/components/ui/SelectField.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import Badge from '@/components/ui/Badge.vue'
+import Modal from '@/components/ui/Modal.vue'
+import Icon from '@/components/ui/Icon.vue'
+import Avatar from '@/components/ui/Avatar.vue'
+import Pagination from '@/components/ui/Pagination.vue'
+import SortIcon from '@/components/ui/SortIcon.vue'
+
+const router = useRouter()
+const clientsStore = useClientsStore()
+const { clients } = storeToRefs(clientsStore)
+
+const PAGE_SIZE = 10
 
 const searchQuery = ref('')
 const showPopup = ref(false)
 const isEditing = ref(false)
-const editIndex = ref<number | null>(null)
-const deleteIndex = ref<number | null>(null)
-const customers = ref<Customer[]>(initialCustomers)
+const editId = ref<number | null>(null)
+const deleteId = ref<number | null>(null)
+const errors = ref<Record<string, string>>({})
+const sortKey = ref<'nom' | 'telephone' | 'nationalite'>('nom')
+const sortDirection = ref<'asc' | 'desc'>('asc')
+const currentPage = ref(1)
 
-const emptyForm = (): Customer => ({
-  id: 0,
-  name: '',
+type ClientFormData = Omit<Client, 'id' | 'telephone' | 'dateEnregistrement'> & { phone: string }
+
+const emptyForm = (): ClientFormData => ({
+  nom: '',
+  prenom: '',
+  sexe: 'F',
+  dateNaissance: '',
+  nationalite: '',
+  adresse: '',
   phone: '',
   email: '',
-  country: '',
+  typePiece: '',
+  paysProvenance: '',
+  lieuNaissance: '',
 })
-const form = ref<Customer>(emptyForm())
+const form = ref<ClientFormData>(emptyForm())
 
-const filteredCustomers = computed(() => {
+const filteredClients = computed(() => {
   const search = searchQuery.value.toLowerCase()
-  return customers.value.filter(
-    (customer) => customer.name.toLowerCase().includes(search) || customer.country.toLowerCase().includes(search),
+  return clients.value.filter(
+    (client) =>
+      client.nom.toLowerCase().includes(search) ||
+      client.prenom.toLowerCase().includes(search) ||
+      client.paysProvenance.toLowerCase().includes(search),
   )
 })
 
+const sortedClients = computed(() => {
+  const dir = sortDirection.value === 'asc' ? 1 : -1
+  return [...filteredClients.value].sort(
+    (a, b) => String(a[sortKey.value]).localeCompare(String(b[sortKey.value]), 'fr') * dir,
+  )
+})
+
+const totalPages = computed(() => Math.max(1, Math.ceil(sortedClients.value.length / PAGE_SIZE)))
+
+const paginatedClients = computed(() =>
+  sortedClients.value.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE),
+)
+
+watch(searchQuery, () => {
+  currentPage.value = 1
+})
+
+function toggleSort(key: typeof sortKey.value) {
+  if (sortKey.value === key) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortKey.value = key
+    sortDirection.value = 'asc'
+  }
+}
+
+function validate(): boolean {
+  errors.value = {}
+  const requiredFields: Array<[keyof ClientFormData, string]> = [
+    ['nom', 'Le nom est requis.'],
+    ['prenom', 'Le prénom est requis.'],
+    ['dateNaissance', 'La date de naissance est requise.'],
+    ['lieuNaissance', 'Le lieu de naissance est requis.'],
+    ['nationalite', 'La nationalité est requise.'],
+    ['phone', 'Le téléphone est requis.'],
+    ['adresse', "L'adresse est requise."],
+    ['typePiece', 'Le type de pièce est requis.'],
+    ['paysProvenance', 'Le pays de provenance est requis.'],
+  ]
+  for (const [field, message] of requiredFields) {
+    if (!form.value[field]?.toString().trim()) {
+      errors.value[field] = message
+    }
+  }
+  return Object.keys(errors.value).length === 0
+}
+
 const openAddPopup = () => {
   isEditing.value = false
-  editIndex.value = null
+  editId.value = null
   form.value = emptyForm()
+  errors.value = {}
   showPopup.value = true
 }
-const editCustomer = (customer: Customer, index: number) => {
+const editClient = (client: Client) => {
   isEditing.value = true
-  editIndex.value = index
-  form.value = { ...customer }
+  editId.value = client.id
+  const { id, telephone, dateEnregistrement, ...rest } = client
+  form.value = { ...rest, phone: telephone }
+  errors.value = {}
   showPopup.value = true
 }
 const closePopup = () => {
   showPopup.value = false
 }
-const saveCustomer = () => {
-  if (isEditing.value && editIndex.value !== null) {
-    customers.value[editIndex.value] = { ...form.value }
+const saveClient = () => {
+  if (!validate()) return
+  const { phone, ...rest } = form.value
+  if (isEditing.value && editId.value !== null) {
+    clientsStore.update(editId.value, { ...rest, telephone: phone })
   } else {
-    customers.value.push({ ...form.value, id: customers.value.length + 1 })
+    clientsStore.add({
+      ...rest,
+      telephone: phone,
+      dateEnregistrement: new Date().toISOString().slice(0, 10),
+    })
   }
   closePopup()
 }
-const confirmDelete = (index: number) => {
-  deleteIndex.value = index
+const confirmDelete = (id: number) => {
+  deleteId.value = id
 }
 const cancelDelete = () => {
-  deleteIndex.value = null
+  deleteId.value = null
 }
-const deleteCustomer = () => {
-  if (deleteIndex.value !== null) {
-    customers.value.splice(deleteIndex.value, 1)
-    deleteIndex.value = null
+const deleteClient = () => {
+  if (deleteId.value !== null) {
+    clientsStore.remove(deleteId.value)
+    deleteId.value = null
   }
 }
+const openDetails = (client: Client) => {
+  router.push({ name: 'customer-details', params: { id: client.id } })
+}
 </script>
+<style scoped>
+.list-row-enter-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.list-row-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+</style>
