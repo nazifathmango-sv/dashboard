@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
 import ChartsView from '@/views/charts/index.vue'
 import RoomsView from '@/views/rooms/index.vue'
 import ReservationsView from '@/views/reservation/index.vue'
@@ -14,6 +13,10 @@ import AdminView from '@/views/admin/index.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+      {
+    path: '/',
+    redirect: '/login',
+  },
     {
       path: '/login',
       name: 'Login',
@@ -34,40 +37,43 @@ const router = createRouter({
       component: HomeView,
       children: [
         {
-          path: '/charts',
+          path: 'charts',
           name: 'charts',
           component: ChartsView,
         },
         {
-          path: '/rooms',
+          path: 'rooms',
           name: 'rooms',
           component: RoomsView,
         },
         {
-          path: '/reservation',
+          path: 'reservation',
           name: 'reservations',
           component: ReservationsView,
         },
         {
-          path: '/customers',
+          path: 'customers',
           name: 'customers',
           component: CustomersView,
         },
         {
-          path: '/service',
+          path: 'service',
           name: 'service',
           component: ServiceView,
         },
         {
-          path: '/staff',
+          path: 'staff',
           name: 'staff',
           component: StaffView,
         },
         {
-          path: '/admin',
-          name: 'admin',
-          component: AdminView,
-        },
+  path: 'admin',
+  name: 'admin',
+  component: AdminView,
+  meta: {
+    requiresAdmin: true
+  }
+},
         {
           path: '/reservation/:id',
           name: 'reservation-details',
@@ -86,5 +92,21 @@ const router = createRouter({
       ],
     },
   ],
+})
+router.beforeEach((to, from, next) => {
+
+  const role = localStorage.getItem('roleUtilisateur')
+
+
+  if (to.meta.requiresAdmin && role !== 'administrateur') {
+
+    next('/charts')
+
+  } else {
+
+    next()
+
+  }
+
 })
 export default router

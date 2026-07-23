@@ -32,22 +32,27 @@
       </div>
       <div class="bg-white rounded-b-2xl shadow-sm overflow-hidden">
         <div
-          v-for="(customer, index) in filteredCustomers"
-          :key="customer.id"
-          class="p-5 md:grid md:grid-cols-4 gap-6 items-center border-b hover:bg-gray-50"
-        >
-          <div>
-            <div class="text-gray-900 font-medium">
-              {{ customer.name }}
-            </div>
-            <Badge tone="gray" class="mt-1">{{ customer.country }}</Badge>
-          </div>
-          <div class="text-gray-600 text-sm mt-2 md:mt-0">
-            {{ customer.phone }}
-          </div>
-          <div class="text-gray-600 text-sm mt-2 md:mt-0">
-            {{ customer.email }}
-          </div>
+  v-for="(customer, index) in filteredCustomers"
+  :key="customer.id || index"
+  class="p-5 md:grid md:grid-cols-4 gap-6 items-center border-b hover:bg-gray-50 transition-colors duration-200"
+>
+         <div>
+  <div class="text-gray-900 font-medium">
+    {{ customer.name || 'Nom indisponible' }}
+  </div>
+
+  <Badge tone="gray" class="mt-1">
+    {{ customer.country || 'Non renseigné' }}
+  </Badge>
+</div>
+
+<div class="text-gray-600 text-sm mt-2 md:mt-0">
+  {{ customer.phone || '-' }}
+</div>
+
+<div class="text-gray-600 text-sm mt-2 md:mt-0">
+  {{ customer.email || '-' }}
+</div>
           <div class="flex md:justify-center items-center gap-3 mt-3 md:mt-0">
             <BaseButton size="sm" variant="secondary" @click="editCustomer(customer, index)">Modifier</BaseButton>
             <BaseButton size="sm" variant="danger" @click="confirmDelete(index)">Supprimer</BaseButton>
@@ -100,70 +105,265 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { customers as initialCustomers, type Customer } from '@/data/customers'
+import { ref, computed, onMounted } from 'vue'
+
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc
+} from 'firebase/firestore'
+
+import { db } from '@/firebase'
+
 import PageHeader from '@/components/ui/PageHeader.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import FormField from '@/components/ui/FormField.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import Badge from '@/components/ui/Badge.vue'
 
+
+type Customer = {
+  id: string
+  name: string
+  phone: string
+  email: string
+  country: string
+}
+
+
 const searchQuery = ref('')
+
 const showPopup = ref(false)
 const isEditing = ref(false)
+
 const editIndex = ref<number | null>(null)
 const deleteIndex = ref<number | null>(null)
-const customers = ref<Customer[]>(initialCustomers)
+
+const customers = ref<Customer[]>([])
+
 
 const emptyForm = (): Customer => ({
-  id: 0,
+  id: '',
   name: '',
   phone: '',
   email: '',
   country: '',
 })
+
+
 const form = ref<Customer>(emptyForm())
 
+
+// Charger les clients depuis Firebase
+const chargerClients = async () => {
+
+  try {
+
+    const snapshot = await getDocs(
+      collection(db, "clients")
+    )
+
+    customers.value = snapshot.docs.map((document) => ({
+      id: document.id,
+      ...(document.data() as Omit<Customer, 'id'>)
+    }))
+
+
+  } catch(error) {
+
+    console.error(
+      "Erreur chargement clients :",
+      error
+    )
+
+  }
+
+}
+
+
+// Recherche
 const filteredCustomers = computed(() => {
+
   const search = searchQuery.value.toLowerCase()
+
   return customers.value.filter(
-    (customer) => customer.name.toLowerCase().includes(search) || customer.country.toLowerCase().includes(search),
+    (customer) =>
+      customer.name.toLowerCase().includes(search) ||
+      customer.country.toLowerCase().includes(search)
   )
+
 })
 
+
+// Ouvrir ajout
 const openAddPopup = () => {
+
   isEditing.value = false
   editIndex.value = null
+
   form.value = emptyForm()
+
   showPopup.value = true
+
 }
-const editCustomer = (customer: Customer, index: number) => {
+
+
+// Modifier
+const editCustomer = (
+  customer: Customer,
+  index: number
+) => {
+
   isEditing.value = true
+
   editIndex.value = index
-  form.value = { ...customer }
+
+  form.value = {
+    ...customer
+  }
+
   showPopup.value = true
+
 }
+
+
+// Fermer popup
 const closePopup = () => {
+
   showPopup.value = false
+
+  form.value = emptyForm()
+
 }
-const saveCustomer = () => {
-  if (isEditing.value && editIndex.value !== null) {
-    customers.value[editIndex.value] = { ...form.value }
-  } else {
-    customers.value.push({ ...form.value, id: customers.value.length + 1 })
+
+
+// Ajouter / Modifier client
+const saveCustomer = async () => {
+
+  try {
+
+
+    // Modification
+    if(
+      isEditing.value &&
+      editIndex.value !== null
+    ){
+
+      const client = customers.value[editIndex.value]
+
+
+      await updateDoc(
+        doc(db, "clients", client.id),
+        {
+          name: form.value.name,
+          phone: form.value.phone,
+          email: form.value.email,
+          country: form.value.country
+        }
+      )
+
+
+    }
+
+    // Ajout
+    else {
+
+      await addDoc(
+        collection(db,"clients"),
+        {
+          name: form.value.name,
+          phone: form.value.phone,
+          email: form.value.email,
+          country: form.value.country
+        }
+      )
+
+    }
+
+
+    await chargerClients()
+
+    closePopup()
+
+
+  } catch(error){
+
+    console.error(
+      "Erreur enregistrement client :",
+      error
+    )
+
   }
-  closePopup()
+
 }
-const confirmDelete = (index: number) => {
+
+
+
+// Ouvrir confirmation suppression
+const confirmDelete = (index:number) => {
+
   deleteIndex.value = index
+
 }
+
+
+// Annuler suppression
 const cancelDelete = () => {
+
   deleteIndex.value = null
+
 }
-const deleteCustomer = () => {
-  if (deleteIndex.value !== null) {
-    customers.value.splice(deleteIndex.value, 1)
+
+
+
+// Supprimer client
+const deleteCustomer = async () => {
+
+
+  if(deleteIndex.value === null)
+    return
+
+
+  try {
+
+
+    const client =
+      filteredCustomers.value[deleteIndex.value]
+
+
+    await deleteDoc(
+      doc(db,"clients",client.id)
+    )
+
+
+    await chargerClients()
+
+
     deleteIndex.value = null
+
+
   }
+  catch(error){
+
+    console.error(
+      "Erreur suppression client :",
+      error
+    )
+
+  }
+
 }
+
+
+
+// Chargement initial
+onMounted(() => {
+
+  chargerClients()
+
+})
+
 </script>

@@ -27,7 +27,6 @@
             </div>
           </router-link>
 
-          <!-- Élément AVEC sous-menu (ex: Service) -->
           <div v-else>
             <button
               type="button"
@@ -59,12 +58,17 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+
 import chambre from '@/assets/icon/chambre.svg'
 import clients from '@/assets/icon/clients.svg'
 import reserve from '@/assets/icon/reserve.svg'
 import tableau from '@/assets/icon/tableau.svg'
 import service from '@/assets/icon/service.svg'
+
+
+const roleUtilisateur = localStorage.getItem('roleUtilisateur')
+
 
 const openMenu = ref<string | null>(null)
 
@@ -72,44 +76,64 @@ const toggleMenu = (name: string) => {
   openMenu.value = openMenu.value === name ? null : name
 }
 
-const menu = [
-  {
-    name: "Tableau de bord",
-    icon: tableau,
-    path: "/charts"
-  },
-  {
-    name: "Clients",
-    icon: clients,
-    path: "/customers"
-  },
-  {
-    name: "Service",
-    icon: service,
-    children: [
-      { name: "Chambres", path: "/rooms" },
-      { name: "Restaurants", path: "/service/restaurants" },
-      { name: "Salle de Réception", path: "/service/salle-de-reception" },
-      { name: "Boite de Nuit", path: "/service/boite-de-nuit" },
-      { name: "Spa", path: "/service/spa" },
-      { name: "Salle de Jeux", path: "/service/salle-de-jeux" },
-      { name: "Salle de Sport", path: "/service/salle-de-sport" },
-    ]
-  },
-  {
-    name: "Reservation",
-    icon: reserve,
-    path: "/reservation"
-  },
-  {
-    name: "Personnel ",
-    icon: service,
-    path: "/staff"
-  },
-  {
-    name: "Administrateur ",
-    icon: service,
-    path: "/admin"
+
+
+const menu = computed(() => {
+
+  const menus = [
+
+    {
+      name: "Tableau de bord",
+      icon: tableau,
+      path: "/charts"
+    },
+
+    {
+      name: "Clients",
+      icon: clients,
+      path: "/customers"
+    },
+
+    {
+      name: "Service",
+      icon: service,
+      children: [
+        { name: "Chambres", path: "/rooms" },
+        { name: "Restaurants", path: "/service/restaurants" },
+        { name: "Salle de Réception", path: "/service/salle-de-reception" },
+        { name: "Boite de Nuit", path: "/service/boite-de-nuit" },
+        { name: "Spa", path: "/service/spa" },
+        { name: "Salle de Jeux", path: "/service/salle-de-jeux" },
+        { name: "Salle de Sport", path: "/service/salle-de-sport" },
+      ]
+    },
+
+    {
+      name: "Reservation",
+      icon: reserve,
+      path: "/reservation"
+    },
+
+    {
+      name: "Personnel",
+      icon: service,
+      path: "/staff"
+    }
+
+  ]
+  if (roleUtilisateur === 'administrateur') {
+
+    menus.push({
+      name: "Administrateur",
+      icon: service,
+      path: "/admin"
+    })
+
   }
-]
+
+
+  return menus
+
+})
+
 </script>
