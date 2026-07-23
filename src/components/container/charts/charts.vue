@@ -1,6 +1,5 @@
 <template>
-  <div class="min-h-screen w-full p-6">
-
+  <div class="min-h-screen w-full p-6 page-enter-anim">
     <div class="space-y-6 max-w-7xl mx-auto">
 
       <PageHeader
@@ -9,168 +8,64 @@
       />
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <div
-          class="bg-white p-5 rounded-xl shadow border border-slate-100
-          flex flex-col justify-between transition-all duration-300
-          hover:shadow-md cursor-pointer min-h-[110px]"
+          class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]"
         >
-
           <div class="flex justify-between items-start">
-
-            <p class="text-3xl font-black text-black">
-              {{ nombreChambres }}
-            </p>
-
-            <img
-              :src="bed"
-              alt="Bed icon"
-              class="w-6 h-6 object-contain"
-            />
-
+            <p class="text-3xl font-black text-black">{{ occupiedCount }}</p>
+            <Icon name="bed" class="w-6 h-6 text-gray-400" />
           </div>
-
-
-          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">
-            Chambres disponibles
-          </p>
-
-
+          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Chambres occupées</p>
         </div>
         <div
-          class="bg-white p-5 rounded-xl shadow border border-slate-100
-          flex flex-col justify-between transition-all duration-300
-          hover:shadow-md cursor-pointer min-h-[110px]"
+          class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]"
         >
-
           <div class="flex justify-between items-start">
-
-
-            <p class="text-3xl font-black text-black">
-              {{ nombreClients }}
-            </p>
-
-
-            <img
-              :src="activitie"
-              alt="Clients icon"
-              class="w-6 h-6 object-contain"
-            />
-
-
+            <div>
+              <p class="text-3xl font-black text-black">{{ occupiedCount }}</p>
+              <div class="text-xs font-bold text-slate-700">occupées / {{ totalCount }}</div>
+            </div>
+            <Icon name="chart-bar" class="w-6 h-6 text-gray-400" />
           </div>
-
-
           <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">
-            Clients enregistrés
+            Capacité globale ({{ occupancyRate }}%)
           </p>
-
-
         </div>
         <div
-          class="bg-white p-5 rounded-xl shadow border border-slate-100
-          flex flex-col justify-between transition-all duration-300
-          hover:shadow-md cursor-pointer min-h-[110px]"
+          class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]"
         >
-
           <div class="flex justify-between items-start">
-
-
-            <p class="text-3xl font-black text-black">
-              {{ nombreReservations }}
-            </p>
-
-
-            <img
-              :src="rocket"
-              alt="Reservation icon"
-              class="w-6 h-6 object-contain"
-            />
-
-
+            <p class="text-3xl font-black text-black">{{ arrivalsToday }}</p>
+            <Icon name="rocket" class="w-6 h-6 text-gray-400" />
           </div>
-
-
-          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">
-            Réservations
-          </p>
-
-
+          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Arrivées attendues</p>
         </div>
         <div
-          class="bg-white p-5 rounded-xl shadow border border-slate-100
-          flex flex-col justify-between transition-all duration-300
-          hover:shadow-md cursor-pointer min-h-[110px]"
+          class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]"
         >
-
           <div class="flex justify-between items-start">
-
-
-            <p class="text-3xl font-black text-black">
-              9.4
-            </p>
-
-
-            <img
-              :src="star"
-              alt="Star icon"
-              class="w-6 h-6 object-contain"
-            />
-
-
+            <p class="text-3xl font-black text-black">9.4</p>
+            <Icon name="star" class="w-6 h-6 text-amber-400" />
           </div>
-
-
-          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">
-            Note moyenne avis
-          </p>
-
-
+          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Note moyenne avis</p>
         </div>
-
-
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div
-          class="bg-white rounded-xl shadow p-5
-          border border-transparent transition-all duration-300 hover:shadow-md"
+          class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 transition-all duration-300 hover:shadow-md"
         >
-
-          <h2 class="text-xl font-bold mb-5 text-slate-700">
-            Statut des chambres (Aujourd'hui)
-          </h2>
-
-
-          <apexchart
-            width="100%"
-            height="260"
-            type="pie"
-            :options="roomPieOptions"
-            :series="roomPieSeries"
-          />
-
+          <h2 class="text-xl font-bold mb-5 text-slate-700">Statut des chambres (Aujourd'hui)</h2>
+          <apexchart width="100%" height="260" type="pie" :options="roomPieOptions" :series="roomPieSeries" />
         </div>
         <div
-          class="bg-white rounded-xl shadow p-5
-          border border-transparent transition-all duration-300 hover:shadow-md"
+          class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 transition-all duration-300 hover:shadow-md"
         >
-
-          <h2 class="text-xl font-bold mb-5 text-slate-700">
-            Taux d'occupation par type de chambre
-          </h2>
-
-
-          <apexchart
-            width="100%"
-            height="220"
-            type="bar"
-            :options="occupancyOptions"
-            :series="occupancySeries"
-          />
+          <h2 class="text-xl font-bold mb-5 text-slate-700">Taux d'occupation par type de chambre</h2>
+          <apexchart width="100%" height="220" type="bar" :options="occupancyOptions" :series="occupancySeries" />
         </div>
       </div>
       <div
-        class="bg-white rounded-xl shadow p-5
-        border border-transparent transition-all duration-300 hover:shadow-md"
+        class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 transition-all duration-300 hover:shadow-md"
       >
 
         <h2 class="text-xl font-bold mb-5 text-slate-700">

@@ -10,6 +10,7 @@ export interface Room {
   personnes: string
   lit: string
   statut: 'Disponible' | 'Complet'
+  equipements: string[]
 }
 
 // TODO: remplacer ce tableau codé en dur par un appel à l'API
@@ -24,6 +25,7 @@ export const rooms: Room[] = [
     personnes: '2 adultes',
     lit: 'Queen Size',
     statut: 'Disponible',
+    equipements: ['Climatisation', 'Wi-Fi gratuit'],
   },
   {
     id: 2,
@@ -34,6 +36,7 @@ export const rooms: Room[] = [
     personnes: '4 adultes',
     lit: '2 lits Queen Size',
     statut: 'Disponible',
+    equipements: ['Climatisation', 'Wi-Fi gratuit', 'Salle de bain privée'],
   },
   {
     id: 3,
@@ -44,6 +47,7 @@ export const rooms: Room[] = [
     personnes: '2 adultes',
     lit: 'King Size',
     statut: 'Disponible',
+    equipements: ['Climatisation', 'Wi-Fi gratuit', 'Salle de bain privée'],
   },
   {
     id: 4,
@@ -54,6 +58,7 @@ export const rooms: Room[] = [
     personnes: '2 adultes',
     lit: 'King Size',
     statut: 'Complet',
+    equipements: ['Climatisation', 'Wi-Fi gratuit', 'Vue sur mer', 'Salle de bain privée'],
   },
   {
     id: 5,
@@ -64,6 +69,7 @@ export const rooms: Room[] = [
     personnes: '6 adultes',
     lit: '3 lits Queen Size',
     statut: 'Disponible',
+    equipements: ['Climatisation', 'Wi-Fi gratuit', 'Salle de bain privée'],
   },
   {
     id: 6,
@@ -74,5 +80,6 @@ export const rooms: Room[] = [
     personnes: '2 adultes',
     lit: 'King Size',
     statut: 'Complet',
+    equipements: ['Climatisation', 'Wi-Fi gratuit', 'Vue sur mer', 'Salle de bain privée'],
   },
 ]

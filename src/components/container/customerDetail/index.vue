@@ -2,5 +2,5 @@
   <CustomerDetail />
 </template>
 <script setup lang="ts">
-import CustomerDetail from '@/components/container/customerDetail/index.vue'
+import CustomerDetail from './customerDetail.vue'
 </script>

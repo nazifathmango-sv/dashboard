@@ -1,11 +1,15 @@
 <template>
-  <div v-if="reservation" class="p-8 max-w-7xl mx-auto bg-gray-50/50 min-h-screen rounded-3xl">
+  <div v-if="reservation" class="p-8 max-w-7xl mx-auto bg-gray-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader
       title="Détails de la réservation"
       subtitle="Gestion des informations client et du séjour."
       back-to
       @back="router.back()"
-    />
+    >
+      <template #actions>
+        <Badge :tone="stayStatusTone(reservation.stayStatus)">{{ reservation.stayStatus }}</Badge>
+      </template>
+    </PageHeader>
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
       <div
         class="bg-white rounded-3xl p-8 border border-gray-200 hover:border-gray-300 hover:shadow-xl transition-all duration-300"
@@ -26,7 +30,10 @@
 
         <div class="mt-10 space-y-6">
           <div class="group border-b pb-4 hover:pl-2 transition-all duration-300">
-            <p class="text-xs uppercase tracking-wider text-gray-400">Téléphone</p>
+            <p class="flex items-center gap-1.5 text-xs uppercase tracking-wider text-gray-400">
+              <Icon name="phone" class="w-3.5 h-3.5" />
+              Téléphone
+            </p>
 
             <p class="mt-1 font-medium text-gray-800">
               {{ reservation.phone }}
@@ -34,7 +41,10 @@
           </div>
 
           <div class="group border-b pb-4 hover:pl-2 transition-all duration-300">
-            <p class="text-xs uppercase tracking-wider text-gray-400">Email</p>
+            <p class="flex items-center gap-1.5 text-xs uppercase tracking-wider text-gray-400">
+              <Icon name="mail" class="w-3.5 h-3.5" />
+              Email
+            </p>
 
             <p class="mt-1 font-medium text-gray-800">
               {{ reservation.email }}
@@ -42,7 +52,10 @@
           </div>
 
           <div class="group border-b pb-4 hover:pl-2 transition-all duration-300">
-            <p class="text-xs uppercase tracking-wider text-gray-400">Pièce d'identité</p>
+            <p class="flex items-center gap-1.5 text-xs uppercase tracking-wider text-gray-400">
+              <Icon name="id-card" class="w-3.5 h-3.5" />
+              Pièce d'identité
+            </p>
 
             <p class="mt-1 font-medium text-gray-800">
               {{ reservation.identityCard }}
@@ -50,7 +63,10 @@
           </div>
 
           <div class="group hover:pl-2 transition-all duration-300">
-            <p class="text-xs uppercase tracking-wider text-gray-400">Pays</p>
+            <p class="flex items-center gap-1.5 text-xs uppercase tracking-wider text-gray-400">
+              <Icon name="location" class="w-3.5 h-3.5" />
+              Pays
+            </p>
 
             <p class="mt-1 font-medium text-gray-800">
               {{ reservation.country }}
@@ -67,7 +83,10 @@
           <div
             class="p-6 rounded-2xl border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all duration-300"
           >
-            <p class="text-xs uppercase tracking-wider text-gray-400">Type</p>
+            <p class="flex items-center gap-1.5 text-xs uppercase tracking-wider text-gray-400">
+              <Icon name="bed" class="w-3.5 h-3.5" />
+              Type
+            </p>
 
             <p class="mt-3 font-semibold text-gray-900 text-lg">
               {{ reservation.type }}
@@ -77,7 +96,10 @@
           <div
             class="p-6 rounded-2xl border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all duration-300"
           >
-            <p class="text-xs uppercase tracking-wider text-gray-400">Arrivée</p>
+            <p class="flex items-center gap-1.5 text-xs uppercase tracking-wider text-gray-400">
+              <Icon name="calendar" class="w-3.5 h-3.5" />
+              Arrivée
+            </p>
 
             <p class="mt-3 font-semibold text-gray-900 text-lg">
               {{ reservation.dateDebut }}
@@ -87,7 +109,10 @@
           <div
             class="p-6 rounded-2xl border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all duration-300"
           >
-            <p class="text-xs uppercase tracking-wider text-gray-400">Départ</p>
+            <p class="flex items-center gap-1.5 text-xs uppercase tracking-wider text-gray-400">
+              <Icon name="calendar" class="w-3.5 h-3.5" />
+              Départ
+            </p>
 
             <p class="mt-3 font-semibold text-gray-900 text-lg">
               {{ reservation.dateFin }}
@@ -97,9 +122,39 @@
           <div
             class="p-6 rounded-2xl border border-gray-100 hover:border-gray-300 hover:shadow-md transition-all duration-300"
           >
-            <p class="text-xs uppercase tracking-wider text-gray-400">Durée</p>
+            <p class="flex items-center gap-1.5 text-xs uppercase tracking-wider text-gray-400">
+              <Icon name="calendar" class="w-3.5 h-3.5" />
+              Durée
+            </p>
 
             <p class="mt-3 font-semibold text-gray-900 text-lg">{{ numberOfDays }} jours</p>
+          </div>
+        </div>
+
+        <div class="mt-10">
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">Suivi du séjour</h3>
+          <div class="flex flex-wrap gap-3">
+            <BaseButton
+              size="sm"
+              :variant="reservation.stayStatus === 'Check-in' ? 'primary' : 'secondary'"
+              @click="setStatus('Check-in')"
+            >
+              Marquer arrivé (check-in)
+            </BaseButton>
+            <BaseButton
+              size="sm"
+              :variant="reservation.stayStatus === 'En cours' ? 'primary' : 'secondary'"
+              @click="setStatus('En cours')"
+            >
+              Marquer en cours
+            </BaseButton>
+            <BaseButton
+              size="sm"
+              :variant="reservation.stayStatus === 'Check-out' ? 'primary' : 'secondary'"
+              @click="setStatus('Check-out')"
+            >
+              Marquer parti (check-out)
+            </BaseButton>
           </div>
         </div>
 
@@ -113,11 +168,21 @@
           ></textarea>
         </div>
         <div class="flex justify-end gap-4 mt-10">
-          <BaseButton variant="danger">Supprimer</BaseButton>
-          <BaseButton variant="primary">Modifier</BaseButton>
+          <BaseButton variant="danger" title="Supprimer" @click="confirmDelete = true">
+            <Icon name="trash" class="w-4 h-4" />
+          </BaseButton>
         </div>
       </div>
     </div>
+
+    <Modal v-model="confirmDelete" size="sm">
+      <h3 class="text-lg font-bold text-gray-800 mb-2">Supprimer la réservation ?</h3>
+      <p class="text-sm text-gray-500 mb-6">Cette action est irréversible.</p>
+      <div class="flex justify-end gap-3">
+        <BaseButton variant="secondary" @click="confirmDelete = false">Annuler</BaseButton>
+        <BaseButton variant="danger" @click="deleteReservation">Supprimer</BaseButton>
+      </div>
+    </Modal>
   </div>
 
   <div v-else class="flex items-center justify-center min-h-screen">
@@ -125,68 +190,25 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useReservationsStore } from '@/stores/reservations'
+import type { StayStatus } from '@/data/reservations'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
+import Badge from '@/components/ui/Badge.vue'
+import Modal from '@/components/ui/Modal.vue'
+import Icon from '@/components/ui/Icon.vue'
 
 const route = useRoute()
 const router = useRouter()
-
-interface Reservation {
-  id: number
-  name: string
-  phone: string
-  email: string
-  identityCard: string
-  country: string
-  type: string
-  dateDebut: string
-  dateFin: string
-}
-
-const reservations: Reservation[] = [
-  {
-    id: 1,
-    name: 'MANGO Nazifath',
-    phone: '+229 01 60 00 00 00',
-    email: 'nazifath@example.com',
-    identityCard: 'B1234567',
-    country: 'Bénin',
-    type: 'Chambre Luxe',
-    dateDebut: '2026-07-20',
-    dateFin: '2026-07-25',
-  },
-  {
-    id: 2,
-    name: 'KODJO Jean',
-    phone: '+229 01 61 00 00 00',
-    email: 'jean@example.com',
-    identityCard: 'A7654321',
-    country: 'Togo',
-    type: 'Salle de fête',
-    dateDebut: '2026-08-01',
-    dateFin: '2026-08-02',
-  },
-  {
-    id: 3,
-    name: 'KODJO Jean',
-    phone: '+229 01 61 00 00 00',
-    email: 'jean@example.com',
-    identityCard: 'A7654321',
-    country: 'Togo',
-    type: 'Restaurants',
-    dateDebut: '2026-08-01',
-    dateFin: '2026-08-02',
-  },
-]
+const reservationsStore = useReservationsStore()
 
 const reservationId = Number(route.params.id)
+const confirmDelete = ref(false)
 
-const reservation = computed<Reservation | undefined>(() => {
-  return reservations.find((item) => item.id === reservationId)
-})
+const reservation = computed(() => reservationsStore.getById(reservationId))
 
 const numberOfDays = computed(() => {
   if (!reservation.value) {
@@ -200,4 +222,28 @@ const numberOfDays = computed(() => {
 
   return Math.ceil(difference / (1000 * 60 * 60 * 24))
 })
+
+function stayStatusTone(status: StayStatus) {
+  switch (status) {
+    case 'Check-in':
+      return 'blue'
+    case 'En cours':
+      return 'green'
+    case 'Check-out':
+      return 'amber'
+    case 'À venir':
+    default:
+      return 'gray'
+  }
+}
+
+function setStatus(status: StayStatus) {
+  reservationsStore.setStayStatus(reservationId, status)
+}
+
+function deleteReservation() {
+  reservationsStore.remove(reservationId)
+  confirmDelete.value = false
+  router.push({ name: 'reservations' })
+}
 </script>

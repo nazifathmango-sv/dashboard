@@ -5,6 +5,7 @@ import ReservationsView from '@/views/reservation/index.vue'
 import CustomersView from '@/views/customers/index.vue'
 import ServiceView from '@/views/service/index.vue'
 import StaffView from '@/views/staff/index.vue'
+import PlanningView from '@/views/planning/index.vue'
 import HomeView from '@/components/helper/homeView.vue'
 import Login from '@/components/container/connexion/login.vue'
 import password from '@/components/container/connexion/password.vue'
@@ -52,7 +53,12 @@ const router = createRouter({
           component: ReservationsView,
         },
         {
-          path: 'customers',
+          path: '/planning',
+          name: 'planning',
+          component: PlanningView,
+        },
+        {
+          path: '/customers',
           name: 'customers',
           component: CustomersView,
         },
