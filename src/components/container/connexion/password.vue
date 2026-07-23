@@ -1,32 +1,36 @@
 <template>
-  <div class="flex h-screen overflow-hidden bg-gray-50">
-    <div class="w-full h-full flex items-center justify-center p-6">
+  <div class="flex h-screen w-screen overflow-hidden bg-gray-50">
+    <div class="hidden w-1/2 h-full bg-[#0f4c9c] md:flex items-center justify-center">
+      <img :src="Img" alt="mango" class="w-full h-full object-cover" />
+    </div>
+    <div class="w-full md:w-1/2 h-full flex items-center justify-center p-6">
       <div
         class="w-full max-w-md bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col items-center"
       >
-        <div class="mb-12 text-center text-4xl font-bold">SunBeach Hotel</div>
-        <div class="w-full m-2 space-y-5">
-          <div>
-            <div class="text-sm font-medium text-gray-700 mb-1">Adresse email</div>
-            <input
-              type="email"
-              placeholder="exemple@gmail.com"
-              class="w-full px-4 py-2 bg-gray-50 border border-gray-400 rounded-lg text-sm focus:outline-none focus:border-gray-400"
-            />
-          </div>
-          <RouterLink to="/reset">
-          <button
-            type="submit"
-            class="w-full py-3 bg-gray-800 text-white font-medium rounded-full transition duration-200 shadow-md text-sm hover:bg-gray-400 hover:text-black border border-transparent hover:border-gray-400 cursor-pointerhover:scale-105 active:scale-95 "
-          >
-            Envoyer l'adreese
-          </button>
+        <div class="mb-2 text-center text-4xl font-bold">SunBeach Hotel</div>
+        <div class="w-full m-8 space-y-5">
+          <FormField v-model="email" type="email" label="Adresse email" placeholder="exemple@gmail.com" />
+          <RouterLink to="/reset" class="block w-full">
+            <BaseButton type="submit" class="w-full">Envoyer l'adresse</BaseButton>
           </RouterLink>
+          <div class="text-center">
+            <RouterLink to="/login">
+              <button class="text-xs text-gray-600 hover:underline font-medium cursor-pointer">
+                Retour à la page de connexion
+              </button>
+            </RouterLink>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import Img from '@/assets/img/pe.webp'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import FormField from '@/components/ui/FormField.vue'
+
+const email = ref('')
 </script>

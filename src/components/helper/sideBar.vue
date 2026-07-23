@@ -109,7 +109,7 @@ const menu = [
   {
     name: "Administrateur ",
     icon: service,
-    path: "/administrateur"
+    path: "/admin"
   }
 ]
 </script>

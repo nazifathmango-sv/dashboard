@@ -1,8 +1,8 @@
 <template>
-  <div class="">
-  <div class="min-h-screen w-full  p-6">
+  <div class="min-h-screen w-full p-6">
     <div class="space-y-6 max-w-7xl mx-auto">
-     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 ">
+      <PageHeader title="Tableau de bord" subtitle="Vue d'ensemble de l'activité de l'hôtel." />
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
   <div class="bg-white p-5 rounded-xl shadow border border-slate-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]">
     <div class="flex justify-between items-start">
       <p class="text-3xl font-black text-black">28</p>
@@ -76,9 +76,9 @@
       </div>
     </div>
   </div>
-  </div>
 </template>
 <script setup lang="ts">
+import PageHeader from '@/components/ui/PageHeader.vue'
 import activitie from '@/assets/icon/activities.svg'
 import bed from '@/assets/icon/bed.svg'
 import rocket from '@/assets/icon/rocket.svg'
