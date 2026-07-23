@@ -80,7 +80,6 @@ const titles: Record<string, string> = {
   'reservation-details': 'Détails de la réservation',
   customers: 'Clients',
   service: 'Service',
- Developpement
   staff: 'Staff',
   'service-details': 'Service',
   'reservation-details': 'Détails de la réservation',
