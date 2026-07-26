@@ -11,6 +11,7 @@ export interface Room {
   lit: string
   statut: 'Disponible' | 'Complet'
   equipements: string[]
+  docId?: string
 }
 
 // TODO: remplacer ce tableau codé en dur par un appel à l'API

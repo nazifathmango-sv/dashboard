@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
 import ChartsView from '@/views/charts/index.vue'
 import RoomsView from '@/views/rooms/index.vue'
 import ReservationsView from '@/views/reservation/index.vue'
@@ -12,85 +11,236 @@ import Login from '@/components/container/connexion/login.vue'
 import password from '@/components/container/connexion/password.vue'
 import reset from '@/components/container/connexion/reset.vue'
 import AdminView from '@/views/admin/index.vue'
+
+
 const router = createRouter({
+
   history: createWebHistory(import.meta.env.BASE_URL),
+
   routes: [
+
+    {
+      path: '/',
+      redirect: '/login',
+    },
+
+
     {
       path: '/login',
       name: 'Login',
       component: Login,
     },
+
+
     {
       path: '/password',
       name: 'password',
       component: password,
     },
+
+
     {
       path: '/reset',
       name: 'reset',
       component: reset,
     },
+
+
     {
-      path: '/',
+      path: '/charts',
       component: HomeView,
+
       children: [
+
+        // Accessible par tous les employés connectés
         {
-          path: '/charts',
+          path: '',
           name: 'charts',
           component: ChartsView,
+          meta:{
+            roles:[
+              "administrateur",
+              "receptionniste"
+            ]
+          }
         },
+
+
         {
-          path: '/rooms',
+          path: 'rooms',
           name: 'rooms',
           component: RoomsView,
+          meta:{
+            roles:[
+              "administrateur",
+              "receptionniste"
+            ]
+          }
         },
+
+
         {
-          path: '/reservation',
+          path: 'reservation',
           name: 'reservations',
           component: ReservationsView,
+          meta:{
+            roles:[
+              "administrateur",
+              "receptionniste"
+            ]
+          }
         },
+
+
         {
-          path: '/planning',
+          path: 'planning',
           name: 'planning',
           component: PlanningView,
+          meta:{
+            roles:[
+              "administrateur",
+              "receptionniste"
+            ]
+          }
         },
+
+
         {
-          path: '/customers',
+          path: 'customers',
           name: 'customers',
           component: CustomersView,
+          meta:{
+            roles:[
+              "administrateur",
+              "receptionniste"
+            ]
+          }
         },
+
+
         {
-          path: '/service',
+          path: 'service',
           name: 'service',
           component: ServiceView,
+          meta:{
+            roles:[
+              "administrateur",
+              "receptionniste"
+            ]
+          }
         },
         {
-          path: '/staff',
+          path: 'staff',
           name: 'staff',
           component: StaffView,
+          meta:{
+            roles:[
+              "administrateur"
+            ]
+          }
         },
+
+
         {
-          path: '/admin',
+          path: 'admin',
           name: 'admin',
           component: AdminView,
+          meta:{
+            roles:[
+              "administrateur"
+            ]
+          }
         },
+
+
         {
-          path: '/reservation/:id',
+          path: 'reservation/:id',
           name: 'reservation-details',
-          component: () => import('@/components/container/reservation/details.vue'),
+          component: () =>
+            import('@/components/container/reservation/details.vue'),
+          meta:{
+            roles:[
+              "administrateur",
+              "receptionniste"
+            ]
+          }
         },
+
+
         {
-          path: '/service/:slug',
+          path: 'service/:slug',
           name: 'service-details',
-          component: () => import('@/views/serviceDetail/index.vue'),
+          component: () =>
+            import('@/views/serviceDetail/index.vue'),
+          meta:{
+            roles:[
+              "administrateur",
+              "receptionniste"
+            ]
+          }
         },
+
+
         {
-          path: '/customers/:id',
+          path: 'customers/:id',
           name: 'customer-details',
-          component: () => import('@/views/customerDetail/index.vue'),
+          component: () =>
+            import('@/views/customerDetail/index.vue'),
+          meta:{
+            roles:[
+              "administrateur",
+              "receptionniste"
+            ]
+          }
         },
+
       ],
     },
+
   ],
+
 })
+
+router.beforeEach((to, from, next) => {
+
+  const role = localStorage.getItem("role")
+
+
+  if(to.meta.roles){
+
+
+    if(!role){
+
+      next('/login')
+
+    }
+
+
+    else if(!to.meta.roles.includes(role)){
+
+
+      next('/charts')
+
+
+    }
+
+
+    else{
+
+      next()
+
+    }
+
+
+  }
+
+  else{
+
+    next()
+
+  }
+
+})
+
+
 export default router

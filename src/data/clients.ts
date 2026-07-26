@@ -12,6 +12,7 @@ export interface Client {
   paysProvenance: string
   dateEnregistrement: string
   lieuNaissance: string
+  docId?: string
 }
 
 // TODO: remplacer ce tableau codé en dur par un appel à l'API

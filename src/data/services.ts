@@ -18,6 +18,7 @@ export interface Service {
   horaires: string
   info: string
   caracteristiques: string[]
+  docId?: string
 }
 
 // TODO: remplacer ce tableau codé en dur par un appel à l'API

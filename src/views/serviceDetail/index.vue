@@ -72,13 +72,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { services } from '@/data/services'
+import { storeToRefs } from 'pinia'
+import { useServicesStore } from '@/stores/services'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ServiceIcon from '@/components/ui/ServiceIcon.vue'
 
 const route = useRoute()
 const router = useRouter()
+const servicesStore = useServicesStore()
+const { services } = storeToRefs(servicesStore)
 
-const service = computed(() => services.find((s) => s.slug === route.params.slug))
+const service = computed(() => services.value.find((s) => s.slug === route.params.slug))
 </script>

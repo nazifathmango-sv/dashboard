@@ -6,6 +6,7 @@ export interface Account {
   email: string
   role: AccountRole
   status: 'Actif' | 'Inactif'
+  docId?: string
 }
 
 // TODO: remplacer ce tableau codé en dur par un appel à l'API

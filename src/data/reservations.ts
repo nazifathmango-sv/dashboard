@@ -12,6 +12,7 @@ export interface Reservation {
   dateDebut: string
   dateFin: string
   stayStatus: StayStatus
+  docId?: string
 }
 
 // TODO: remplacer ce tableau codé en dur par un appel à l'API
