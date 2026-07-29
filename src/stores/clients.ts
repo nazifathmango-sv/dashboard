@@ -1,32 +1,103 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { clients as seedClients, type Client } from '@/data/clients'
+import {
+  collection,
+  addDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  doc,
+} from 'firebase/firestore'
+import type { Client } from '@/data/clients'
+import { clients as seedClients } from '@/data/clients'
+import { db } from '@/firebase'
 
 export const useClientsStore = defineStore('clients', () => {
-  const clients = ref<Client[]>(seedClients.map((client) => ({ ...client })))
+  const clients = ref<Client[]>([])
+  const loading = ref(false)
+  const clientsCollection = collection(db, 'clients')
 
-  function getById(id: number) {
-    return clients.value.find((client) => client.id === id)
-  }
-
-  function add(data: Omit<Client, 'id'>) {
-    const nextId = Math.max(0, ...clients.value.map((client) => client.id)) + 1
-    clients.value.push({ ...data, id: nextId })
-  }
-
-  function update(id: number, patch: Partial<Client>) {
-    const index = clients.value.findIndex((client) => client.id === id)
-    if (index !== -1) {
-      clients.value[index] = { ...clients.value[index], ...patch }
+  async function fetchClients() {
+    if (loading.value) return
+    loading.value = true
+    try {
+      const snapshot = await getDocs(clientsCollection)
+      if (snapshot.empty) {
+        clients.value = seedClients.map((c) => ({ ...c }))
+      } else {
+        clients.value = snapshot.docs.map((firestoreDoc, idx) => {
+          const data = firestoreDoc.data() as Client & { id?: number }
+          return {
+            ...data,
+            id: data.id ?? idx + 1,
+            docId: firestoreDoc.id,
+          }
+        })
+      }
+    } finally {
+      loading.value = false
     }
   }
 
-  function remove(id: number) {
-    const index = clients.value.findIndex((client) => client.id === id)
-    if (index !== -1) {
-      clients.value.splice(index, 1)
-    }
+  async function add(data: Omit<Client, 'id' | 'docId'>) {
+    const newDoc = await addDoc(clientsCollection, { ...data })
+    clients.value.push({ ...(data as Client), docId: newDoc.id })
   }
 
-  return { clients, getById, add, update, remove }
+  async function update(idOrDocId: number | string, patch: Partial<Client>) {
+    const client = typeof idOrDocId === 'string'
+      ? clients.value.find((item) => item.docId === idOrDocId)
+      : clients.value.find((item) => item.id === idOrDocId)
+    let targetDocId = client?.docId
+
+    if (targetDocId) {
+      await updateDoc(doc(db, 'clients', targetDocId), patch)
+    } else {
+      if (typeof idOrDocId === 'string') {
+        // try updating directly by docId
+        await updateDoc(doc(db, 'clients', idOrDocId), patch)
+      } else {
+        const q = query(clientsCollection, where('id', '==', idOrDocId))
+        const snapshot = await getDocs(q)
+        if (!snapshot.empty) {
+          await updateDoc(doc(db, 'clients', snapshot.docs[0].id), patch)
+        }
+      }
+    }
+    if (client) Object.assign(client, patch)
+  }
+
+  async function remove(idOrDocId: number | string) {
+    const index = typeof idOrDocId === 'string'
+      ? clients.value.findIndex((item) => item.docId === idOrDocId)
+      : clients.value.findIndex((item) => item.id === idOrDocId)
+    if (index === -1) return
+    const client = clients.value[index]
+    const docId = client?.docId
+    if (docId) {
+      await deleteDoc(doc(db, 'clients', docId))
+    } else {
+      if (typeof idOrDocId === 'string') {
+        await deleteDoc(doc(db, 'clients', idOrDocId))
+      } else {
+        const q = query(clientsCollection, where('id', '==', idOrDocId))
+        const snapshot = await getDocs(q)
+        if (!snapshot.empty) {
+          await deleteDoc(doc(db, 'clients', snapshot.docs[0].id))
+        }
+      }
+    }
+    clients.value.splice(index, 1)
+  }
+
+  function getById(idOrDocId: number | string) {
+    if (typeof idOrDocId === 'string') return clients.value.find((c) => c.docId === idOrDocId)
+    return clients.value.find((client) => client.id === idOrDocId)
+  }
+
+  fetchClients()
+
+  return { clients, loading, getById, add, update, remove, fetchClients }
 })

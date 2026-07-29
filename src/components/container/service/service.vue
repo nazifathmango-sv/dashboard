@@ -41,13 +41,17 @@
   </div>
 </template>
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
-import { services, type Service } from '@/data/services'
+import { useServicesStore } from '@/stores/services'
+import type { Service } from '@/data/services'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ServiceIcon from '@/components/ui/ServiceIcon.vue'
 
 const router = useRouter()
+const servicesStore = useServicesStore()
+const { services } = storeToRefs(servicesStore)
 
 const handleClick = (service: Service) => {
   if (service.titre === 'Chambres') {

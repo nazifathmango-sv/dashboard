@@ -4,6 +4,7 @@ export interface StaffMember {
   poste: string
   phone: string
   status: 'Actif' | 'Inactif'
+  docId?: string
 }
 
 // TODO: remplacer ce tableau codé en dur par un appel à l'API
