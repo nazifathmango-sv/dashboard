@@ -16,3 +16,8 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Instance secondaire, utilisée uniquement pour créer de nouveaux comptes
+// (Authentication) sans déconnecter l'administrateur actuellement connecté.
+const secondaryApp = initializeApp(firebaseConfig, "secondary");
+export const secondaryAuth = getAuth(secondaryApp);

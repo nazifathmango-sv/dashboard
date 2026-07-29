@@ -3,7 +3,8 @@
     <div>
       <button
         v-if="backTo"
-        class="mb-2 inline-flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-gray-800 transition cursor-pointer"
+        type="button"
+        class="mb-2 inline-flex items-center gap-1 text-sm font-semibold text-navy-300 hover:text-navy-500 transition-colors duration-200 cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2"
         @click="$emit('back')"
       >
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
@@ -11,10 +12,10 @@
         </svg>
         Retour
       </button>
-      <h1 class="text-2xl font-bold text-gray-900 tracking-tight">
+      <h1 class="text-2xl font-bold text-navy-500 tracking-tight">
         {{ title }}
       </h1>
-      <p v-if="subtitle" class="text-gray-500 mt-1 text-sm">
+      <p v-if="subtitle" class="text-navy-300 mt-1 text-sm">
         {{ subtitle }}
       </p>
     </div>

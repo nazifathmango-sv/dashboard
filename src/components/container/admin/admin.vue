@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl page-enter-anim">
+  <div class="p-6 max-w-7xl mx-auto font-sans bg-sand-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader title="Administrateur" subtitle="Gestion des comptes ayant accès au tableau de bord.">
       <template #actions>
         <BaseButton @click="openAddPopup">
@@ -9,12 +9,22 @@
       </template>
     </PageHeader>
 
+    <div class="mb-6 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-600">
+      À la création d'un compte, un email de définition de mot de passe est automatiquement envoyé à la
+      personne concernée. La modification du profil (nom, rôle, statut) d'un compte existant n'envoie aucun
+      email et n'affecte pas ses identifiants de connexion.
+    </div>
+
+    <p v-if="formError" class="mb-6 rounded-xl border border-coral-200 bg-coral-50 px-4 py-3 text-sm text-coral-500" role="alert">
+      {{ formError }}
+    </p>
+
     <PageCard class="mb-6">
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Rechercher par nom ou rôle..."
-        class="w-full md:w-96 px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:bg-white transition"
+        class="w-full md:w-96 px-4 py-2.5 bg-sand-50 border border-sand-300 rounded-xl text-sm text-navy-400 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:bg-white transition"
       />
     </PageCard>
 
@@ -26,17 +36,17 @@
 
     <template v-else>
       <div
-        class="hidden md:grid grid-cols-4 gap-6 px-6 py-4 bg-white border-b font-semibold text-sm text-gray-500 uppercase rounded-t-2xl"
+        class="hidden md:grid grid-cols-4 gap-6 px-6 py-4 bg-white border-b font-semibold text-sm text-navy-300 uppercase rounded-t-2xl"
       >
-        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('name')">
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-navy-400" @click="toggleSort('name')">
           Nom et prénoms
           <SortIcon :active="sortKey === 'name'" :direction="sortDirection" />
         </button>
-        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('email')">
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-navy-400" @click="toggleSort('email')">
           Email
           <SortIcon :active="sortKey === 'email'" :direction="sortDirection" />
         </button>
-        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('role')">
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-navy-400" @click="toggleSort('role')">
           Rôle
           <SortIcon :active="sortKey === 'role'" :direction="sortDirection" />
         </button>
@@ -52,17 +62,17 @@
           v-for="(account, index) in paginatedAccounts"
           :key="account.id"
           :style="{ transitionDelay: `${Math.min(index * 20, 200)}ms` }"
-          class="p-5 md:grid md:grid-cols-4 gap-6 items-center border-b border-l-4 hover:bg-gray-50 hover:shadow-sm transition-colors duration-150"
-          :class="account.status === 'Actif' ? 'border-green-500' : 'border-gray-200'"
+          class="p-5 md:grid md:grid-cols-4 gap-6 items-center border-b border-l-4 hover:bg-sand-50 hover:shadow-sm transition-colors duration-150"
+          :class="account.status === 'Actif' ? 'border-lagoon-500' : 'border-sand-200'"
         >
           <div class="flex items-center gap-3">
             <Avatar :name="account.name" />
-            <div class="text-gray-900 font-medium">
+            <div class="text-navy-500 font-medium">
               {{ account.name }}
             </div>
             <Badge :tone="account.status === 'Actif' ? 'green' : 'gray'">{{ account.status }}</Badge>
           </div>
-          <div class="text-gray-600 text-sm mt-2 md:mt-0">
+          <div class="text-navy-300 text-sm mt-2 md:mt-0">
             {{ account.email }}
           </div>
           <div class="mt-2 md:mt-0">
@@ -82,7 +92,7 @@
     </template>
 
     <Modal v-model="showPopup" size="lg">
-      <h3 class="text-xl font-bold text-gray-800 text-center mb-6">
+      <h3 class="text-xl font-bold text-navy-500 text-center mb-6">
         {{ isEditing ? 'Modifier le compte' : 'Nouveau compte' }}
       </h3>
       <form @submit.prevent="saveAccount" class="space-y-4">
@@ -103,9 +113,8 @@
         />
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SelectField v-model="form.role" label="Rôle">
-            <option value="Admin">Admin</option>
-            <option value="Manager">Manager</option>
-            <option value="Staff">Staff</option>
+            <option value="administrateur">Administrateur</option>
+            <option value="receptionniste">Réceptionniste</option>
           </SelectField>
           <SelectField v-model="form.status" label="Statut">
             <option value="Actif">Actif</option>
@@ -114,14 +123,14 @@
         </div>
         <div class="flex justify-end gap-3 pt-5">
           <BaseButton type="button" variant="secondary" @click="closePopup">Annuler</BaseButton>
-          <BaseButton type="submit">{{ isEditing ? 'Confirmer la modification' : 'Enregistrer' }}</BaseButton>
+          <BaseButton type="submit" :loading="saving">{{ isEditing ? 'Confirmer la modification' : 'Enregistrer' }}</BaseButton>
         </div>
       </form>
     </Modal>
 
     <Modal :model-value="deleteId !== null" size="sm" @update:model-value="cancelDelete">
-      <h3 class="text-lg font-bold text-gray-800 mb-2">Supprimer ce compte ?</h3>
-      <p class="text-sm text-gray-500 mb-6">Cette action est irréversible.</p>
+      <h3 class="text-lg font-bold text-navy-500 mb-2">Supprimer ce compte ?</h3>
+      <p class="text-sm text-navy-300 mb-6">Cette action est irréversible.</p>
       <div class="flex justify-end gap-3">
         <BaseButton variant="secondary" @click="cancelDelete">Annuler</BaseButton>
         <BaseButton variant="danger" @click="deleteAccount">Supprimer</BaseButton>
@@ -167,7 +176,7 @@ type AccountFormData = Omit<Account, 'id'>
 const emptyForm = (): AccountFormData => ({
   name: '',
   email: '',
-  role: 'Staff',
+  role: 'receptionniste',
   status: 'Actif',
 })
 const form = ref<AccountFormData>(emptyForm())
@@ -207,13 +216,11 @@ function toggleSort(key: typeof sortKey.value) {
 
 const roleTone = (role: AccountRole) => {
   switch (role) {
-    case 'Admin':
+    case 'administrateur':
       return 'amber'
-    case 'Manager':
-      return 'blue'
-    case 'Staff':
+    case 'receptionniste':
     default:
-      return 'gray'
+      return 'blue'
   }
 }
 
@@ -224,11 +231,15 @@ function validate(): boolean {
   return Object.keys(errors.value).length === 0
 }
 
+const saving = ref(false)
+const formError = ref('')
+
 const openAddPopup = () => {
   isEditing.value = false
   editId.value = null
   form.value = emptyForm()
   errors.value = {}
+  formError.value = ''
   showPopup.value = true
 }
 const editAccount = (account: Account) => {
@@ -237,19 +248,35 @@ const editAccount = (account: Account) => {
   const { id, ...rest } = account
   form.value = { ...rest }
   errors.value = {}
+  formError.value = ''
   showPopup.value = true
 }
 const closePopup = () => {
   showPopup.value = false
 }
-const saveAccount = () => {
+const saveAccount = async () => {
   if (!validate()) return
-  if (isEditing.value && editId.value !== null) {
-    accountsStore.update(editId.value, form.value)
-  } else {
-    accountsStore.add(form.value)
+  formError.value = ''
+  saving.value = true
+  try {
+    if (isEditing.value && editId.value !== null) {
+      await accountsStore.update(editId.value, form.value)
+    } else {
+      await accountsStore.add(form.value)
+    }
+    closePopup()
+  } catch (error: any) {
+    console.error('[saveAccount] erreur lors de l’enregistrement du compte :', error)
+    if (error.code === 'auth/email-already-in-use') {
+      formError.value = 'Un compte existe déjà avec cette adresse email.'
+    } else if (error.code === 'auth/invalid-email') {
+      formError.value = 'Adresse email invalide.'
+    } else {
+      formError.value = "Une erreur est survenue lors de l'enregistrement du compte."
+    }
+  } finally {
+    saving.value = false
   }
-  closePopup()
 }
 const confirmDelete = (id: number) => {
   deleteId.value = id

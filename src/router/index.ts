@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import ChartsView from '@/views/charts/index.vue'
 import RoomsView from '@/views/rooms/index.vue'
 import ReservationsView from '@/views/reservation/index.vue'
@@ -201,44 +202,31 @@ const router = createRouter({
 
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
 
-  const role = localStorage.getItem("role")
-
-
-  if(to.meta.roles){
-
-
-    if(!role){
-
-      next('/login')
-
-    }
-
-
-    else if(!to.meta.roles.includes(role)){
-
-
-      next('/charts')
-
-
-    }
-
-
-    else{
-
-      next()
-
-    }
-
-
-  }
-
-  else{
-
+  if (!to.meta.roles) {
     next()
-
+    return
   }
+
+  const authStore = useAuthStore()
+  await authStore.waitUntilReady()
+
+  const role = authStore.role
+
+  if (!role) {
+    next('/login')
+    return
+  }
+
+  const allowedRoles = to.meta.roles as string[]
+
+  if (!allowedRoles.includes(role)) {
+    next('/charts')
+    return
+  }
+
+  next()
 
 })
 

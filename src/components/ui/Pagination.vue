@@ -1,6 +1,6 @@
 <template>
-  <div v-if="totalPages > 1" class="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-100 rounded-b-2xl">
-    <p class="text-sm text-gray-500">Page {{ currentPage }} / {{ totalPages }}</p>
+  <div v-if="totalPages > 1" class="flex flex-col gap-3 sm:flex-row items-center justify-between px-4 sm:px-6 py-4 bg-white border-t border-sand-200 rounded-b-2xl">
+    <p class="text-sm text-navy-300">Page {{ currentPage }} / {{ totalPages }}</p>
     <div class="flex items-center gap-2">
       <BaseButton
         size="sm"

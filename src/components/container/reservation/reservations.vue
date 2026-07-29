@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl page-enter-anim">
+  <div class="p-6 max-w-7xl mx-auto font-sans bg-sand-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader title="Réservations" subtitle="Gestion des réservations clients.">
       <template #actions>
         <BaseButton @click="openAddPopup">
@@ -14,7 +14,7 @@
         v-model="searchQuery"
         type="text"
         placeholder="Rechercher par nom ou type..."
-        class="w-full md:w-96 px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:bg-white transition"
+        class="w-full md:w-96 px-4 py-2.5 bg-sand-50 border border-sand-300 rounded-xl text-sm text-navy-400 placeholder:text-navy-200 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus:bg-white"
       />
     </PageCard>
 
@@ -26,25 +26,25 @@
 
     <template v-else>
       <div
-        class="hidden md:grid grid-cols-6 gap-3 px-6 py-4 bg-white border-b font-semibold text-sm text-gray-500 uppercase rounded-t-2xl"
+        class="hidden md:grid grid-cols-6 gap-3 px-6 py-4 bg-white border-b font-semibold text-sm text-navy-300 uppercase rounded-t-2xl"
       >
-        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('name')">
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer transition-colors duration-150 hover:text-navy-400 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400" @click="toggleSort('name')">
           Nom et prénoms
           <SortIcon :active="sortKey === 'name'" :direction="sortDirection" />
         </button>
-        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('type')">
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer transition-colors duration-150 hover:text-navy-400 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400" @click="toggleSort('type')">
           Type
           <SortIcon :active="sortKey === 'type'" :direction="sortDirection" />
         </button>
-        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('dateDebut')">
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer transition-colors duration-150 hover:text-navy-400 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400" @click="toggleSort('dateDebut')">
           Date début
           <SortIcon :active="sortKey === 'dateDebut'" :direction="sortDirection" />
         </button>
-        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('dateFin')">
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer transition-colors duration-150 hover:text-navy-400 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400" @click="toggleSort('dateFin')">
           Date fin
           <SortIcon :active="sortKey === 'dateFin'" :direction="sortDirection" />
         </button>
-        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('stayStatus')">
+        <button type="button" class="flex items-center gap-1 text-left cursor-pointer transition-colors duration-150 hover:text-navy-400 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400" @click="toggleSort('stayStatus')">
           Statut séjour
           <SortIcon :active="sortKey === 'stayStatus'" :direction="sortDirection" />
         </button>
@@ -60,25 +60,26 @@
           v-for="(reservation, index) in paginatedReservations"
           :key="reservation.id"
           :style="{ transitionDelay: `${Math.min(index * 20, 200)}ms` }"
-          class="p-5 md:grid md:grid-cols-6 gap-3 items-center border-b border-l-4 hover:bg-gray-50 hover:shadow-sm transition-colors duration-150"
+          class="p-5 md:grid md:grid-cols-6 gap-3 items-center border-b border-l-4 hover:bg-sand-50 hover:shadow-sm transition-colors duration-150"
           :class="rowBorderClass(reservation)"
         >
           <div class="flex items-center gap-3">
             <Avatar :name="reservation.name" />
-            <div
+            <button
+              type="button"
               @click="openDetails(reservation)"
-              class="text-gray-900 font-medium cursor-pointer hover:text-gray-600 transition"
+              class="text-navy-500 font-medium cursor-pointer transition-colors duration-150 hover:text-navy-300 text-left rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
             >
               {{ reservation.name }}
-            </div>
+            </button>
           </div>
           <div>
             <Badge tone="blue">{{ reservation.type }}</Badge>
           </div>
-          <div class="text-gray-600 text-sm">
+          <div class="text-navy-300 text-sm">
             {{ reservation.dateDebut }}
           </div>
-          <div class="text-gray-600 text-sm">
+          <div class="text-navy-300 text-sm">
             {{ reservation.dateFin }}
           </div>
           <div>
@@ -98,12 +99,12 @@
     </template>
 
     <Modal v-model="showPopup" size="lg">
-      <h3 class="text-xl font-bold text-gray-800 text-center mb-6">
+      <h3 class="text-xl font-bold text-navy-500 text-center mb-6">
         {{ isEditing ? 'Modifier la réservation' : "Fiche d'enregistrement client" }}
       </h3>
       <form @submit.prevent="saveReservation" class="space-y-6">
         <div>
-          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">Client</h4>
+          <h4 class="text-sm font-semibold text-navy-400 mb-3 pb-2 border-b border-sand-200">Client</h4>
           <div class="space-y-4">
             <FormField
               v-model="form.name"
@@ -150,7 +151,7 @@
         </div>
 
         <div>
-          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">Séjour</h4>
+          <h4 class="text-sm font-semibold text-navy-400 mb-3 pb-2 border-b border-sand-200">Séjour</h4>
           <div class="space-y-4">
             <FormField
               v-model="form.type"
@@ -192,8 +193,8 @@
     </Modal>
 
     <Modal :model-value="deleteId !== null" size="sm" @update:model-value="cancelDelete">
-      <h3 class="text-lg font-bold text-gray-800 mb-2">Supprimer la réservation ?</h3>
-      <p class="text-sm text-gray-500 mb-6">Cette action est irréversible.</p>
+      <h3 class="text-lg font-bold text-navy-500 mb-2">Supprimer la réservation ?</h3>
+      <p class="text-sm text-navy-300 mb-6">Cette action est irréversible.</p>
       <div class="flex justify-end gap-3">
         <BaseButton variant="secondary" @click="cancelDelete">Annuler</BaseButton>
         <BaseButton variant="danger" @click="deleteReservation">Supprimer</BaseButton>
@@ -305,12 +306,12 @@ function rowBorderClass(reservation: Reservation) {
   switch (reservation.stayStatus) {
     case 'Check-in':
     case 'En cours':
-      return 'border-green-500'
+      return 'border-lagoon-500'
     case 'Check-out':
-      return 'border-amber-500'
+      return 'border-gold-500'
     case 'À venir':
     default:
-      return 'border-gray-200'
+      return 'border-sand-200'
   }
 }
 

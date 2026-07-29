@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-full bg-gray-900 text-white flex items-center justify-center font-semibold shrink-0"
+    class="rounded-full bg-navy-500 text-gold-200 flex items-center justify-center font-semibold shrink-0"
     :class="sizeClasses"
   >
     {{ initial }}

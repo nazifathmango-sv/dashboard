@@ -4,66 +4,66 @@
       <PageHeader title="Tableau de bord" subtitle="Vue d'ensemble de l'activité de l'hôtel." />
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <div
-          class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]"
+          class="bg-white p-5 rounded-2xl shadow-sm border border-sand-200 flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 cursor-default min-h-[110px]"
         >
           <div class="flex justify-between items-start">
-            <p class="text-3xl font-black text-black">{{ occupiedCount }}</p>
-            <Icon name="bed" class="w-6 h-6 text-gray-400" />
+            <p class="text-3xl font-bold text-navy-500 tabular-nums">{{ occupiedCount }}</p>
+            <Icon name="bed" class="w-6 h-6 text-navy-200" />
           </div>
-          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Chambres occupées</p>
+          <p class="text-sm font-semibold text-navy-300 mt-2 leading-tight">Chambres occupées</p>
         </div>
         <div
-          class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]"
+          class="bg-white p-5 rounded-2xl shadow-sm border border-sand-200 flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 cursor-default min-h-[110px]"
         >
           <div class="flex justify-between items-start">
             <div>
-              <p class="text-3xl font-black text-black">{{ occupiedCount }}</p>
-              <div class="text-xs font-bold text-slate-700">occupées / {{ totalCount }}</div>
+              <p class="text-3xl font-bold text-navy-500 tabular-nums">{{ occupiedCount }}</p>
+              <div class="text-xs font-semibold text-navy-300 mt-0.5">occupées / {{ totalCount }}</div>
             </div>
-            <Icon name="chart-bar" class="w-6 h-6 text-gray-400" />
+            <Icon name="chart-bar" class="w-6 h-6 text-navy-200" />
           </div>
-          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">
+          <p class="text-sm font-semibold text-navy-300 mt-2 leading-tight">
             Capacité globale ({{ occupancyRate }}%)
           </p>
         </div>
         <div
-          class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]"
+          class="bg-white p-5 rounded-2xl shadow-sm border border-sand-200 flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 cursor-default min-h-[110px]"
         >
           <div class="flex justify-between items-start">
-            <p class="text-3xl font-black text-black">{{ arrivalsToday }}</p>
-            <Icon name="rocket" class="w-6 h-6 text-gray-400" />
+            <p class="text-3xl font-bold text-navy-500 tabular-nums">{{ arrivalsToday }}</p>
+            <Icon name="rocket" class="w-6 h-6 text-navy-200" />
           </div>
-          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Arrivées attendues</p>
+          <p class="text-sm font-semibold text-navy-300 mt-2 leading-tight">Arrivées attendues</p>
         </div>
         <div
-          class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer min-h-[110px]"
+          class="bg-white p-5 rounded-2xl shadow-sm border border-sand-200 flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 cursor-default min-h-[110px]"
         >
           <div class="flex justify-between items-start">
-            <p class="text-3xl font-black text-black">9.4</p>
-            <Icon name="star" class="w-6 h-6 text-amber-400" />
+            <p class="text-3xl font-bold text-navy-500 tabular-nums">9.4</p>
+            <Icon name="star" class="w-6 h-6 text-gold-400" />
           </div>
-          <p class="text-sm font-bold text-slate-900 mt-2 leading-tight">Note moyenne avis</p>
+          <p class="text-sm font-semibold text-navy-300 mt-2 leading-tight">Note moyenne avis</p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div
-          class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 transition-all duration-300 hover:shadow-md"
+          class="bg-white rounded-2xl shadow-sm p-5 border border-sand-200 transition-all duration-300 hover:shadow-md"
         >
-          <h2 class="text-xl font-bold mb-5 text-slate-700">Statut des chambres (Aujourd'hui)</h2>
+          <h2 class="text-lg font-bold mb-5 text-navy-500">Statut des chambres (Aujourd'hui)</h2>
           <apexchart width="100%" height="260" type="pie" :options="roomPieOptions" :series="roomPieSeries" />
         </div>
         <div
-          class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 transition-all duration-300 hover:shadow-md"
+          class="bg-white rounded-2xl shadow-sm p-5 border border-sand-200 transition-all duration-300 hover:shadow-md"
         >
-          <h2 class="text-xl font-bold mb-5 text-slate-700">Taux d'occupation par type de chambre</h2>
+          <h2 class="text-lg font-bold mb-5 text-navy-500">Taux d'occupation par type de chambre</h2>
           <apexchart width="100%" height="220" type="bar" :options="occupancyOptions" :series="occupancySeries" />
         </div>
       </div>
       <div
-        class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 transition-all duration-300 hover:shadow-md"
+        class="bg-white rounded-2xl shadow-sm p-5 border border-sand-200 transition-all duration-300 hover:shadow-md"
       >
-        <h2 class="text-xl font-bold mb-5 text-slate-700">Réservations mensuelles</h2>
+        <h2 class="text-lg font-bold mb-5 text-navy-500">Réservations mensuelles</h2>
         <apexchart
           width="100%"
           height="350"
@@ -94,8 +94,8 @@ const roomPieSeries = computed(() => [occupiedCount.value, totalCount.value - oc
 const roomPieOptions = computed(() => ({
   chart: { id: 'room-pie-chart' },
   labels: ['Occupées', 'Disponibles'],
-  colors: ['#3b82f6', '#10b981'],
-  legend: { position: 'bottom', labels: { colors: '#475569' } },
+  colors: ['#34505e', '#4f9d92'],
+  legend: { position: 'bottom', labels: { colors: '#5f7885' } },
 }))
 
 const monthLabels = ['Jan', 'Fév', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil', 'Août', 'Sept', 'Oct', 'Nov', 'Déc']
@@ -115,8 +115,8 @@ const monthlyBookingOptions = {
     axisBorder: { show: false },
     axisTicks: { show: false },
   },
-  grid: { borderColor: '#f1f5f9', xaxis: { lines: { show: false } } },
-  colors: ['#fbbf24'],
+  grid: { borderColor: '#f3ece0', xaxis: { lines: { show: false } } },
+  colors: ['#c9a15a'],
 }
 
 const occupancySeries = computed(() => [
@@ -125,7 +125,7 @@ const occupancySeries = computed(() => [
 const occupancyOptions = computed(() => ({
   chart: { id: 'occupancy-rate-chart', toolbar: { show: false } },
   plotOptions: { bar: { horizontal: true, barHeight: '35%', borderRadius: 4 } },
-  colors: ['#3b82f6'],
+  colors: ['#34505e'],
   grid: { show: false },
   xaxis: {
     categories: rooms.value.map((room) => room.titre),
@@ -137,7 +137,7 @@ const occupancyOptions = computed(() => ({
   dataLabels: {
     enabled: true,
     formatter: (val: number) => val + '%',
-    style: { colors: ['#475569'] },
+    style: { colors: ['#5f7885'] },
     offsetX: 10,
   },
 }))

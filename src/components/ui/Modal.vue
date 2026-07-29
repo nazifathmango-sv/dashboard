@@ -7,7 +7,7 @@
     >
       <div
         @click.stop
-        class="modal-card bg-white p-6 rounded-2xl shadow-xl w-full mx-4 overflow-y-auto max-h-[90vh]"
+        class="modal-card bg-sand-50 p-6 rounded-3xl shadow-2xl ring-1 ring-navy-500/5 w-full mx-4 overflow-y-auto max-h-[90vh]"
         :class="size === 'sm' ? 'max-w-sm' : 'max-w-lg'"
       >
         <slot />

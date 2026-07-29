@@ -1,6 +1,6 @@
 <template>
   <div
-    class="w-72 h-screen bg-gray-800 text-white p-6 shadow-2xl flex flex-col justify-between overflow-y-auto"
+    class="w-72 h-screen bg-navy-600 text-white p-6 shadow-2xl flex flex-col justify-between overflow-y-auto border-r border-gold-400/10"
   >
 
     <div>
@@ -8,12 +8,12 @@
       <!-- LOGO -->
       <div class="text-center mb-10 cursor-pointer">
 
-        <h1 class="text-3xl font-extrabold tracking-wide">
+        <h1 class="text-3xl font-extrabold tracking-wide text-sand-50">
           Sunbeach Hotel
         </h1>
 
         <div class="flex justify-center mt-4">
-          <div class="w-24 h-1 bg-amber-200 rounded-full"></div>
+          <div class="w-24 h-1 bg-gold-400 rounded-full"></div>
         </div>
 
       </div>
@@ -29,7 +29,7 @@
         >
 
           <p
-            class="px-4 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-500"
+            class="px-4 mb-2 text-xs font-semibold uppercase tracking-wider text-navy-200"
           >
             {{ section.label }}
           </p>
@@ -48,8 +48,9 @@
               <RouterLink
                 v-if="!item.children"
                 :to="item.path"
-                class="text-base flex items-center gap-4 px-4 py-3 rounded-2xl font-semibold text-gray-300 transition-all duration-300 hover:border hover:border-amber-200 hover:translate-x-1"
-                active-class="text-gray-200 shadow-lg border border-b-4 border-amber-200"
+                class="text-base flex items-center gap-4 px-4 py-3 rounded-2xl font-semibold text-navy-100 border border-transparent transition-all duration-300 hover:border-gold-400/40 hover:translate-x-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-600"
+                active-class=""
+                exact-active-class="!text-sand-50 bg-navy-500 shadow-lg border-gold-400/60 border-b-4"
               >
 
                 <Icon
@@ -72,7 +73,7 @@
 
                 <button
                   type="button"
-                  class="w-full text-base flex items-center justify-between gap-4 px-4 py-3 rounded-2xl font-semibold text-gray-300 transition-all duration-300 hover:border hover:border-amber-200 hover:translate-x-1"
+                  class="w-full text-base flex items-center justify-between gap-4 px-4 py-3 rounded-2xl font-semibold text-navy-100 border border-transparent transition-all duration-300 hover:border-gold-400/40 hover:translate-x-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-600 cursor-pointer"
                   @click="toggleMenu(item.name)"
                 >
 
@@ -122,8 +123,9 @@
                     v-for="sub in item.children"
                     :key="sub.name"
                     :to="sub.path"
-                    class="text-sm px-4 py-2 rounded-xl font-medium text-gray-400 hover:text-gray-100 hover:bg-gray-700 transition-colors"
-                    active-class="text-gray-100 bg-gray-700"
+                    class="text-sm px-4 py-2 rounded-xl font-medium text-navy-200 hover:text-sand-50 hover:bg-navy-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-600"
+                    active-class=""
+                    exact-active-class="text-sand-50 bg-navy-500"
                   >
 
                     {{ sub.name }}
@@ -157,6 +159,7 @@
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useServicesStore } from '@/stores/services'
+import { useAuthStore } from '@/stores/auth'
 import Icon from '@/components/ui/Icon.vue'
 
 const openMenu = ref<string | null>(null)
@@ -165,8 +168,8 @@ const toggleMenu = (name: string) => {
   openMenu.value = openMenu.value === name ? null : name
 }
 
-// récupérer le rôle connecté
-const role = localStorage.getItem('role')
+// rôle de l'utilisateur connecté (réactif, source de vérité Firestore)
+const { role } = storeToRefs(useAuthStore())
 
 const sections = [
   {
@@ -211,7 +214,7 @@ const displayedSections = computed(() =>
       .map((item: any) => (item.name === 'Service' ? { ...item, children: serviceChildren.value } : item))
       .filter((item: any) => {
         if (!item.role) return true
-        return item.role.includes(role || '')
+        return item.role.includes(role.value || '')
       })
 
     return {

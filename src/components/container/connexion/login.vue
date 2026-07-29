@@ -1,95 +1,38 @@
 <template>
-  <div class="flex h-screen w-screen overflow-hidden bg-gray-50">
-
-    <div class="hidden w-1/2 h-full bg-[#0f4c9c] md:flex items-center justify-center">
-      <img :src="Img" alt="mango" class="w-full h-full object-cover" />
+  <div class="flex h-screen w-screen overflow-hidden bg-sand-50 font-sans">
+    <div class="hidden w-1/2 h-full bg-navy-600 md:flex items-center justify-center">
+      <img :src="Img" alt="Hôtel SunBeach" class="w-full h-full object-cover" />
     </div>
-
 
     <div class="w-full md:w-1/2 h-full flex items-center justify-center p-6">
-
       <div
-        class="w-full max-w-md bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col items-center"
+        class="w-full max-w-md bg-white rounded-3xl p-8 shadow-sm border border-sand-200 flex flex-col items-center"
       >
+        <h1 class="mb-1 text-center text-3xl font-bold text-navy-500 tracking-tight">SunBeach Hotel</h1>
+        <p class="mb-8 text-center text-sm text-navy-300">Connectez-vous à votre espace d'administration.</p>
 
-        <div class="mb-8 text-center text-4xl font-bold">
-          SunBeach Hotel
-        </div>
+        <form @submit.prevent="handleLogin" class="w-full space-y-5">
+          <FormField v-model="email" type="email" label="Adresse email" placeholder="exemple@gmail.com" required />
 
-
-
-        <form
-          @submit.prevent="handleLogin"
-          class="w-full space-y-5"
-        >
-
-
-          <FormField
-            v-model="email"
-            type="email"
-            label="Adresse email"
-            placeholder="exemple@gmail.com"
-          />
-
-
-
-          <FormField
-            v-model="password"
-            type="password"
-            label="Mot de passe"
-            placeholder="..........."
-          />
-
-
+          <FormField v-model="password" type="password" label="Mot de passe" placeholder="···········" required />
 
           <div class="text-center">
-
-            <RouterLink to="/password">
-
-              <button
-                type="button"
-                class="text-xs text-gray-600 hover:underline font-medium cursor-pointer"
-              >
-                Mot de passe oublié ?
-              </button>
-
+            <RouterLink
+              to="/password"
+              class="text-xs font-medium text-navy-300 hover:text-navy-500 hover:underline transition-colors duration-150 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2"
+            >
+              Mot de passe oublié ?
             </RouterLink>
-
           </div>
 
+          <BaseButton type="submit" class="w-full">Connexion</BaseButton>
 
-
-
-          <BaseButton
-            type="submit"
-            class="w-full"
-          >
-
-            Connexion
-
-          </BaseButton>
-
-
-
-          <p
-            v-if="errorMessage"
-            class="text-red-500 text-sm text-center"
-          >
-
+          <p v-if="errorMessage" class="text-sm text-center text-coral-500" role="alert">
             {{ errorMessage }}
-
           </p>
-
-
-
         </form>
-
-
       </div>
-
     </div>
-
-
   </div>
 </template>
 
@@ -106,6 +49,7 @@ import { doc, getDoc } from 'firebase/firestore'
 
 
 import { auth, db } from '@/firebase'
+import { useAuthStore } from '@/stores/auth'
 
 
 import Img from '@/assets/img/pe.webp'
@@ -120,6 +64,7 @@ const errorMessage = ref('')
 
 
 const router = useRouter()
+const authStore = useAuthStore()
 
 
 
@@ -199,33 +144,8 @@ const handleLogin = async () => {
 
 
 
-      // Nettoyage ancien utilisateur
-      localStorage.removeItem("role")
-
-
-
-      // Enregistrement nouveau rôle
-      localStorage.setItem(
-
-        "role",
-
-        userData.role
-
-      )
-
-
-
-
-      console.log(
-
-        "Rôle enregistré :",
-
-        localStorage.getItem("role")
-
-      )
-
-
-
+      // Attendre que le store d'auth soit synchronisé avant de rediriger
+      await authStore.waitUntilReady()
 
       // Redirection dashboard
       router.push('/charts')

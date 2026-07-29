@@ -1,0 +1,56 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function currentRole() {
+      return get(/databases/$(database)/documents/utilisateur/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && currentRole() == 'administrateur';
+    }
+
+    function isStaff() {
+      return isSignedIn() && currentRole() in ['administrateur', 'receptionniste'];
+    }
+
+    // Profil utilisateur : chacun lit son propre profil pour connaître son rôle.
+    // Seul un administrateur peut créer/modifier/supprimer des profils (gestion des comptes).
+    match /utilisateur/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow write: if isAdmin();
+    }
+
+    // Données opérationnelles de l'hôtel : lecture/écriture pour le personnel connecté.
+    match /rooms/{roomId} {
+      allow read, write: if isStaff();
+    }
+
+    match /clients/{clientId} {
+      allow read, write: if isStaff();
+    }
+
+    match /reservations/{reservationId} {
+      allow read, write: if isStaff();
+    }
+
+    match /services/{serviceId} {
+      allow read, write: if isStaff();
+    }
+
+    // Gestion du personnel : réservée aux administrateurs.
+    match /staff/{staffId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Par défaut, tout accès est refusé sauf règle explicite ci-dessus.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

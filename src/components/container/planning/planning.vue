@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl page-enter-anim">
+  <div class="p-6 max-w-7xl mx-auto font-sans bg-sand-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader title="Planning" subtitle="Disponibilité des chambres jour par jour.">
       <template #actions>
         <BaseButton variant="secondary" size="sm" @click="shiftWindow(-windowSize)">← Précédent</BaseButton>
@@ -8,55 +8,61 @@
       </template>
     </PageHeader>
 
-    <div class="flex flex-wrap items-center gap-4 mb-4 text-xs text-gray-500">
-      <div class="flex items-center gap-2">
-        <span class="w-3 h-3 rounded bg-gray-50 border border-gray-200"></span>
-        Libre
+    <PageCard padding="sm" class="mb-6">
+      <div class="flex flex-wrap items-center gap-4 text-xs font-medium text-navy-300">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded bg-sand-50 border border-sand-200"></span>
+          Libre
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded bg-lagoon-100 border-l-4 border-lagoon-500"></span>
+          Arrivée
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded bg-navy-100"></span>
+          Occupée
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded bg-gold-100 border-r-4 border-gold-500"></span>
+          Départ
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="w-3 h-3 rounded bg-green-100 border-l-4 border-green-500"></span>
-        Arrivée
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="w-3 h-3 rounded bg-blue-100"></span>
-        Occupée
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="w-3 h-3 rounded bg-amber-100 border-r-4 border-amber-500"></span>
-        Départ
-      </div>
-    </div>
+    </PageCard>
 
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-x-auto">
+    <div class="bg-white rounded-2xl shadow-sm border border-sand-200 overflow-x-auto">
       <table class="min-w-full border-collapse text-sm">
         <thead>
           <tr>
             <th
-              class="sticky left-0 z-10 bg-white text-left font-semibold text-gray-500 uppercase text-xs px-4 py-3 border-b border-r border-gray-100 min-w-[180px]"
+              class="sticky left-0 z-10 bg-white text-left font-semibold text-navy-300 uppercase text-xs px-4 py-3 border-b border-r border-sand-200 min-w-[180px]"
             >
               Chambre
             </th>
             <th
               v-for="day in days"
               :key="day"
-              class="text-center font-semibold text-xs px-2 py-3 border-b border-gray-100 min-w-[64px]"
-              :class="isToday(day) ? 'bg-amber-50 text-amber-700' : 'text-gray-500'"
+              class="text-center font-semibold text-xs px-2 py-3 border-b border-sand-200 min-w-[64px] transition-colors duration-150"
+              :class="isToday(day) ? 'bg-gold-50 text-gold-600' : 'text-navy-300'"
             >
               {{ formatDayLabel(day) }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="room in rooms" :key="room.id" class="border-b border-gray-50 last:border-0">
+          <tr
+            v-for="room in rooms"
+            :key="room.id"
+            class="group border-b border-sand-100 last:border-0 transition-colors duration-150"
+          >
             <td
-              class="sticky left-0 z-10 bg-white px-4 py-3 border-r border-gray-100 font-medium text-gray-800"
+              class="sticky left-0 z-10 bg-white px-4 py-3 border-r border-sand-200 font-medium text-navy-500 transition-colors duration-150 group-hover:bg-sand-50"
             >
               {{ room.titre }}
             </td>
             <td
               v-for="day in days"
               :key="day"
-              class="px-2 py-3 text-center"
+              class="px-2 py-3 text-center transition-colors duration-150 group-hover:brightness-95"
               :class="cellClasses(room.id, day)"
               :title="cellTooltip(room.id, day)"
             ></td>
@@ -72,6 +78,7 @@ import { storeToRefs } from 'pinia'
 import { useRoomsStore } from '@/stores/rooms'
 import { useReservationsStore } from '@/stores/reservations'
 import PageHeader from '@/components/ui/PageHeader.vue'
+import PageCard from '@/components/ui/PageCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 
 const { rooms } = storeToRefs(useRoomsStore())
@@ -114,10 +121,10 @@ function reservationFor(roomId: number, dateISO: string) {
 
 function cellClasses(roomId: number, dateISO: string) {
   const reservation = reservationFor(roomId, dateISO)
-  if (!reservation) return 'bg-gray-50/60'
-  if (reservation.dateDebut === dateISO) return 'bg-green-100 border-l-4 border-green-500'
-  if (reservation.dateFin === dateISO) return 'bg-amber-100 border-r-4 border-amber-500'
-  return 'bg-blue-100'
+  if (!reservation) return 'bg-sand-50/60'
+  if (reservation.dateDebut === dateISO) return 'bg-lagoon-100 border-l-4 border-lagoon-500'
+  if (reservation.dateFin === dateISO) return 'bg-gold-100 border-r-4 border-gold-500'
+  return 'bg-navy-100'
 }
 
 function cellTooltip(roomId: number, dateISO: string) {

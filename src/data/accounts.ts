@@ -1,4 +1,4 @@
-export type AccountRole = 'Admin' | 'Manager' | 'Staff'
+export type AccountRole = 'administrateur' | 'receptionniste'
 
 export interface Account {
   id: number
@@ -16,14 +16,14 @@ export const accounts: Account[] = [
     id: 1,
     name: 'MANGO Chefick',
     email: 'chefick@sunbeachhotel.com',
-    role: 'Admin',
+    role: 'administrateur',
     status: 'Actif',
   },
   {
     id: 2,
     name: 'AGBOTON Rachelle',
     email: 'rachelle@sunbeachhotel.com',
-    role: 'Manager',
+    role: 'receptionniste',
     status: 'Actif',
   },
 ]

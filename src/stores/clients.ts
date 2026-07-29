@@ -61,8 +61,9 @@ export const useClientsStore = defineStore('clients', () => {
       } else {
         const q = query(clientsCollection, where('id', '==', idOrDocId))
         const snapshot = await getDocs(q)
-        if (!snapshot.empty) {
-          await updateDoc(doc(db, 'clients', snapshot.docs[0].id), patch)
+        const found = snapshot.docs[0]
+        if (found) {
+          await updateDoc(doc(db, 'clients', found.id), patch)
         }
       }
     }
@@ -84,8 +85,9 @@ export const useClientsStore = defineStore('clients', () => {
       } else {
         const q = query(clientsCollection, where('id', '==', idOrDocId))
         const snapshot = await getDocs(q)
-        if (!snapshot.empty) {
-          await deleteDoc(doc(db, 'clients', snapshot.docs[0].id))
+        const found = snapshot.docs[0]
+        if (found) {
+          await deleteDoc(doc(db, 'clients', found.id))
         }
       }
     }

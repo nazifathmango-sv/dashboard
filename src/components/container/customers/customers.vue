@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl page-enter-anim">
+  <div class="p-6 max-w-7xl mx-auto font-sans bg-sand-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader title="Clients" subtitle="Gestion des clients de l'hôtel.">
       <template #actions>
         <BaseButton @click="openAddPopup">
@@ -14,7 +14,7 @@
         v-model="searchQuery"
         type="text"
         placeholder="Rechercher par nom ou pays..."
-        class="w-full md:w-96 px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:bg-white transition"
+        class="w-full md:w-96 px-4 py-2.5 bg-sand-50 border border-sand-300 rounded-xl text-sm text-navy-400 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:bg-white transition"
       />
     </PageCard>
 
@@ -26,17 +26,29 @@
 
     <template v-else>
       <div
-        class="hidden md:grid grid-cols-4 gap-6 px-6 py-4 bg-white border-b font-semibold text-sm text-gray-500 uppercase rounded-t-2xl"
+        class="hidden md:grid grid-cols-4 gap-6 px-6 py-4 bg-white border-b font-semibold text-sm text-navy-300 uppercase rounded-t-2xl"
       >
-        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('nom')">
+        <button
+          type="button"
+          class="flex items-center gap-1 text-left cursor-pointer hover:text-navy-400 transition-colors duration-150 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2"
+          @click="toggleSort('nom')"
+        >
           Nom et prénoms
           <SortIcon :active="sortKey === 'nom'" :direction="sortDirection" />
         </button>
-        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('telephone')">
+        <button
+          type="button"
+          class="flex items-center gap-1 text-left cursor-pointer hover:text-navy-400 transition-colors duration-150 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2"
+          @click="toggleSort('telephone')"
+        >
           Téléphone
           <SortIcon :active="sortKey === 'telephone'" :direction="sortDirection" />
         </button>
-        <button type="button" class="flex items-center gap-1 text-left cursor-pointer hover:text-gray-700" @click="toggleSort('nationalite')">
+        <button
+          type="button"
+          class="flex items-center gap-1 text-left cursor-pointer hover:text-navy-400 transition-colors duration-150 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2"
+          @click="toggleSort('nationalite')"
+        >
           Nationalité
           <SortIcon :active="sortKey === 'nationalite'" :direction="sortDirection" />
         </button>
@@ -52,24 +64,25 @@
           v-for="(client, index) in paginatedClients"
           :key="client.id"
           :style="{ transitionDelay: `${Math.min(index * 20, 200)}ms` }"
-          class="p-5 md:grid md:grid-cols-4 gap-6 items-center border-b hover:bg-gray-50 hover:shadow-sm transition-colors duration-150"
+          class="p-5 md:grid md:grid-cols-4 gap-6 items-center border-b hover:bg-sand-50 hover:shadow-sm transition-colors duration-150"
         >
           <div class="flex items-center gap-3">
             <Avatar :name="`${client.nom} ${client.prenom}`" />
             <div>
-              <div
+              <button
+                type="button"
+                class="text-navy-500 font-medium text-left hover:text-navy-300 transition-colors duration-150 cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2"
                 @click="openDetails(client)"
-                class="text-gray-900 font-medium cursor-pointer hover:text-gray-600 transition"
               >
                 {{ client.nom }} {{ client.prenom }}
-              </div>
+              </button>
               <Badge tone="gray" class="mt-1">{{ client.paysProvenance }}</Badge>
             </div>
           </div>
-          <div class="text-gray-600 text-sm mt-2 md:mt-0">
+          <div class="text-navy-300 text-sm mt-2 md:mt-0">
             {{ client.telephone }}
           </div>
-          <div class="text-gray-600 text-sm mt-2 md:mt-0">
+          <div class="text-navy-300 text-sm mt-2 md:mt-0">
             {{ client.nationalite }}
           </div>
           <div class="flex md:justify-center items-center gap-3 mt-3 md:mt-0">
@@ -86,12 +99,12 @@
     </template>
 
     <Modal v-model="showPopup" size="lg">
-      <h3 class="text-xl font-bold text-gray-800 text-center mb-6">
+      <h3 class="text-xl font-bold text-navy-500 text-center mb-6">
         {{ isEditing ? 'Modifier le client' : 'Nouveau client' }}
       </h3>
       <form @submit.prevent="saveClient" class="space-y-6">
         <div>
-          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">Identité</h4>
+          <h4 class="text-sm font-semibold text-navy-400 mb-3 pb-2 border-b border-sand-200">Identité</h4>
           <div class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
@@ -142,7 +155,7 @@
         </div>
 
         <div>
-          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">Contact</h4>
+          <h4 class="text-sm font-semibold text-navy-400 mb-3 pb-2 border-b border-sand-200">Contact</h4>
           <div class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
@@ -166,7 +179,7 @@
         </div>
 
         <div>
-          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">Documents</h4>
+          <h4 class="text-sm font-semibold text-navy-400 mb-3 pb-2 border-b border-sand-200">Documents</h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
               v-model="form.typePiece"
@@ -193,8 +206,8 @@
     </Modal>
 
     <Modal :model-value="deleteId !== null" size="sm" @update:model-value="cancelDelete">
-      <h3 class="text-lg font-bold text-gray-800 mb-2">Supprimer ce client ?</h3>
-      <p class="text-sm text-gray-500 mb-6">Cette action est irréversible.</p>
+      <h3 class="text-lg font-bold text-navy-500 mb-2">Supprimer ce client ?</h3>
+      <p class="text-sm text-navy-300 mb-6">Cette action est irréversible.</p>
       <div class="flex justify-end gap-3">
         <BaseButton variant="secondary" @click="cancelDelete">Annuler</BaseButton>
         <BaseButton variant="danger" @click="deleteClient">Supprimer</BaseButton>
@@ -237,7 +250,7 @@ const sortKey = ref<'nom' | 'telephone' | 'nationalite'>('nom')
 const sortDirection = ref<'asc' | 'desc'>('asc')
 const currentPage = ref(1)
 
-type ClientFormData = Omit<Client, 'id' | 'telephone' | 'dateEnregistrement'> & { phone: string }
+type ClientFormData = Omit<Client, 'id' | 'telephone' | 'dateEnregistrement'> & { phone: string; email: string }
 
 const emptyForm = (): ClientFormData => ({
   nom: '',
@@ -322,7 +335,7 @@ const editClient = (client: Client) => {
   isEditing.value = true
   editId.value = client.id
   const { id, telephone, dateEnregistrement, ...rest } = client
-  form.value = { ...rest, phone: telephone }
+  form.value = { ...rest, phone: telephone, email: rest.email ?? '' }
   errors.value = {}
   showPopup.value = true
 }

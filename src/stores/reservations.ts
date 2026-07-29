@@ -63,7 +63,7 @@ export const useReservationsStore = defineStore('reservations', () => {
 
   async function add(data: Omit<Reservation, 'id' | 'stayStatus' | 'docId'>) {
     const newDoc = await addDoc(reservationsCollection, { ...data, stayStatus: 'À venir' })
-    reservations.value.push({ ...data, stayStatus: 'À venir', docId: newDoc.id })
+    reservations.value.push({ ...(data as Reservation), stayStatus: 'À venir', docId: newDoc.id })
   }
 
   async function update(idOrDocId: number | string, patch: Partial<Reservation>) {
@@ -80,8 +80,9 @@ export const useReservationsStore = defineStore('reservations', () => {
       } else {
         const q = query(reservationsCollection, where('id', '==', idOrDocId))
         const snapshot = await getDocs(q)
-        if (!snapshot.empty) {
-          await updateDoc(doc(db, 'reservations', snapshot.docs[0].id), patch)
+        const found = snapshot.docs[0]
+        if (found) {
+          await updateDoc(doc(db, 'reservations', found.id), patch)
         }
       }
     }
@@ -103,8 +104,9 @@ export const useReservationsStore = defineStore('reservations', () => {
       } else {
         const q = query(reservationsCollection, where('id', '==', idOrDocId))
         const snapshot = await getDocs(q)
-        if (!snapshot.empty) {
-          await deleteDoc(doc(db, 'reservations', snapshot.docs[0].id))
+        const found = snapshot.docs[0]
+        if (found) {
+          await deleteDoc(doc(db, 'reservations', found.id))
         }
       }
     }

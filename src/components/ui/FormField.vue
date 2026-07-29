@@ -1,15 +1,16 @@
 <template>
   <div>
-    <label v-if="label" class="text-xs font-semibold text-gray-500 uppercase">
+    <label v-if="label" class="text-xs font-semibold text-navy-300 uppercase tracking-wide">
       {{ label }}
     </label>
     <textarea
       v-if="multiline"
       :value="modelValue"
       :placeholder="placeholder"
+      :disabled="disabled"
       rows="4"
-      class="w-full mt-1 px-4 py-2.5 bg-gray-50 border rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:bg-white transition resize-none"
-      :class="invalid ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-gray-800'"
+      class="w-full mt-1 px-4 py-2.5 bg-sand-50 border rounded-xl text-sm text-navy-500 placeholder:text-navy-200 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus:bg-white resize-none disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-sand-100"
+      :class="invalid ? 'border-coral-400 focus-visible:ring-coral-400' : 'border-sand-300 focus-visible:ring-gold-400'"
       @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
     ></textarea>
     <input
@@ -18,11 +19,12 @@
       :value="modelValue"
       :placeholder="placeholder"
       :required="required"
-      class="w-full mt-1 px-4 py-2.5 bg-gray-50 border rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:bg-white transition"
-      :class="invalid ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-gray-800'"
+      :disabled="disabled"
+      class="w-full mt-1 px-4 py-2.5 bg-sand-50 border rounded-xl text-sm text-navy-500 placeholder:text-navy-200 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-sand-100"
+      :class="invalid ? 'border-coral-400 focus-visible:ring-coral-400' : 'border-sand-300 focus-visible:ring-gold-400'"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     />
-    <p v-if="invalid && error" class="mt-1 text-xs text-red-600">{{ error }}</p>
+    <p v-if="invalid && error" class="mt-1 text-xs text-coral-500">{{ error }}</p>
   </div>
 </template>
 <script setup lang="ts">
@@ -36,6 +38,7 @@ withDefaults(
     invalid?: boolean
     error?: string
     multiline?: boolean
+    disabled?: boolean
   }>(),
   {
     type: 'text',

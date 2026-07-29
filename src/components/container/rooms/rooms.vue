@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl page-enter-anim">
+  <div class="p-6 max-w-7xl mx-auto font-sans bg-sand-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader title="Nos Chambres" subtitle="Aperçu des chambres et suites disponibles à l'hôtel.">
       <template #actions>
         <BaseButton @click="openAddPopup">
@@ -19,7 +19,7 @@
       <div
         v-for="room in rooms"
         :key="room.id"
-        class="group rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+        class="group rounded-2xl overflow-hidden shadow-sm border border-sand-200 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
       >
         <div class="relative h-56 w-full overflow-hidden">
           <img
@@ -39,22 +39,22 @@
         </div>
 
         <div class="p-5">
-          <p class="text-sm text-gray-500 mb-4">
+          <p class="text-sm text-navy-300 mb-4">
             {{ room.description }}
           </p>
 
           <div class="grid grid-cols-3 gap-2 text-center mb-4">
-            <div class="bg-amber-50 rounded-lg p-2">
-              <p class="text-xs text-gray-500">Prix</p>
-              <p class="text-sm font-semibold text-gray-800">{{ room.prix }}</p>
+            <div class="bg-gold-50 rounded-lg p-2.5 transition-colors duration-200">
+              <p class="text-xs text-navy-300 font-medium">Prix</p>
+              <p class="text-sm font-semibold text-navy-500 mt-0.5">{{ room.prix }}</p>
             </div>
-            <div class="bg-amber-50 rounded-lg p-2">
-              <p class="text-xs text-gray-500">Personnes</p>
-              <p class="text-sm font-semibold text-gray-800">{{ room.personnes }}</p>
+            <div class="bg-gold-50 rounded-lg p-2.5 transition-colors duration-200">
+              <p class="text-xs text-navy-300 font-medium">Personnes</p>
+              <p class="text-sm font-semibold text-navy-500 mt-0.5">{{ room.personnes }}</p>
             </div>
-            <div class="bg-amber-50 rounded-lg p-2">
-              <p class="text-xs text-gray-500">Lit</p>
-              <p class="text-sm font-semibold text-gray-800">{{ room.lit }}</p>
+            <div class="bg-gold-50 rounded-lg p-2.5 transition-colors duration-200">
+              <p class="text-xs text-navy-300 font-medium">Lit</p>
+              <p class="text-sm font-semibold text-navy-500 mt-0.5">{{ room.lit }}</p>
             </div>
           </div>
 
@@ -62,14 +62,14 @@
             <span
               v-for="item in room.equipements"
               :key="item"
-              class="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50 rounded-lg px-2.5 py-1.5"
+              class="inline-flex items-center gap-1.5 text-xs font-medium text-navy-300 bg-sand-50 rounded-lg px-2.5 py-1.5 transition-colors duration-200"
             >
               <Icon :name="equipementIcon(item)" class="w-3.5 h-3.5" />
               {{ item }}
             </span>
           </div>
 
-          <div class="flex items-center justify-between gap-2 pt-4 mt-4 border-t border-gray-100">
+          <div class="flex items-center justify-between gap-2 pt-4 mt-4 border-t border-sand-200">
             <BaseButton size="sm" variant="secondary" @click="router.push('/planning')">
               <Icon name="calendar" class="w-4 h-4" />
               Voir le planning
@@ -88,12 +88,12 @@
     </div>
 
     <Modal v-model="showPopup" size="lg">
-      <h3 class="text-xl font-bold text-gray-800 text-center mb-6">
+      <h3 class="text-xl font-bold text-navy-500 text-center mb-6">
         {{ isEditing ? 'Modifier la chambre' : 'Nouvelle chambre' }}
       </h3>
       <form @submit.prevent="saveRoom" class="space-y-6">
         <div>
-          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">
+          <h4 class="text-sm font-semibold text-navy-400 mb-3 pb-2 border-b border-sand-200">
             Informations générales
           </h4>
           <div class="space-y-4">
@@ -117,7 +117,7 @@
         </div>
 
         <div>
-          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">
+          <h4 class="text-sm font-semibold text-navy-400 mb-3 pb-2 border-b border-sand-200">
             Tarification & Capacité
           </h4>
           <div class="space-y-4">
@@ -152,13 +152,13 @@
         </div>
 
         <div>
-          <h4 class="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">Équipements</h4>
+          <h4 class="text-sm font-semibold text-navy-400 mb-3 pb-2 border-b border-sand-200">Équipements</h4>
           <div class="flex gap-2 mb-3">
             <input
               v-model="newEquipement"
               type="text"
               placeholder="Ex: Wi-Fi gratuit"
-              class="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-800 focus:bg-white transition"
+              class="flex-1 px-4 py-2.5 bg-sand-50 border border-sand-300 rounded-xl text-sm text-navy-400 placeholder:text-navy-200 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus:bg-white"
               @keydown.enter.prevent="addEquipement"
             />
             <BaseButton type="button" variant="secondary" @click="addEquipement">Ajouter</BaseButton>
@@ -167,10 +167,14 @@
             <span
               v-for="(item, index) in form.equipements"
               :key="item"
-              class="inline-flex items-center gap-1.5 text-xs text-gray-600 bg-gray-50 rounded-lg px-2.5 py-1.5"
+              class="inline-flex items-center gap-1.5 text-xs font-medium text-navy-300 bg-sand-50 rounded-lg px-2.5 py-1.5"
             >
               {{ item }}
-              <button type="button" class="text-gray-400 hover:text-gray-700" @click="form.equipements.splice(index, 1)">
+              <button
+                type="button"
+                class="text-navy-200 hover:text-navy-400 transition-colors duration-150 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
+                @click="form.equipements.splice(index, 1)"
+              >
                 ×
               </button>
             </span>
@@ -185,8 +189,8 @@
     </Modal>
 
     <Modal :model-value="deleteId !== null" size="sm" @update:model-value="cancelDelete">
-      <h3 class="text-lg font-bold text-gray-800 mb-2">Supprimer cette chambre ?</h3>
-      <p class="text-sm text-gray-500 mb-6">Cette action est irréversible.</p>
+      <h3 class="text-lg font-bold text-navy-500 mb-2">Supprimer cette chambre ?</h3>
+      <p class="text-sm text-navy-300 mb-6">Cette action est irréversible.</p>
       <div class="flex justify-end gap-3">
         <BaseButton variant="secondary" @click="cancelDelete">Annuler</BaseButton>
         <BaseButton variant="danger" @click="deleteRoom">Supprimer</BaseButton>

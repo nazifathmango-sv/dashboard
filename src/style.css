@@ -1,5 +1,43 @@
 @import "tailwindcss";
 
+@theme {
+  /* Luxe côtier — sable chaud, bleu nuit, or discret */
+  --color-sand-50: #fdfbf7;
+  --color-sand-100: #faf7f2;
+  --color-sand-200: #f3ece0;
+  --color-sand-300: #e8dcc8;
+  --color-sand-400: #d6c3a1;
+
+  --color-navy-50: #eef2f4;
+  --color-navy-100: #cdd8de;
+  --color-navy-200: #9fb3bd;
+  --color-navy-300: #5f7885;
+  --color-navy-400: #34505e;
+  --color-navy-500: #1c2b33;
+  --color-navy-600: #16232b;
+  --color-navy-700: #101a20;
+  --color-navy-800: #0b1216;
+  --color-navy-900: #070c0f;
+
+  --color-gold-50: #faf5ea;
+  --color-gold-100: #f0e2c2;
+  --color-gold-200: #e2c98d;
+  --color-gold-300: #d4af5f;
+  --color-gold-400: #c9a15a;
+  --color-gold-500: #b28a44;
+  --color-gold-600: #8f6d36;
+
+  --color-lagoon-50: #eef6f5;
+  --color-lagoon-100: #d6ebe7;
+  --color-lagoon-400: #4f9d92;
+  --color-lagoon-500: #3a7d74;
+
+  --color-coral-50: #fdf0ee;
+  --color-coral-100: #fadbd6;
+  --color-coral-400: #d9694f;
+  --color-coral-500: #b8503a;
+}
+
 @keyframes page-in {
   from {
     opacity: 0;

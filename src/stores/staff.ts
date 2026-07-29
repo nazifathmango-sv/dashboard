@@ -64,8 +64,9 @@ export const useStaffStore = defineStore('staff', () => {
       } else {
         const q = query(staffCollection, where('id', '==', idOrDocId))
         const snapshot = await getDocs(q)
-        if (!snapshot.empty) {
-          await updateDoc(doc(db, 'staff', snapshot.docs[0].id), patch)
+        const found = snapshot.docs[0]
+        if (found) {
+          await updateDoc(doc(db, 'staff', found.id), patch)
         }
       }
     }
@@ -87,8 +88,9 @@ export const useStaffStore = defineStore('staff', () => {
       } else {
         const q = query(staffCollection, where('id', '==', idOrDocId))
         const snapshot = await getDocs(q)
-        if (!snapshot.empty) {
-          await deleteDoc(doc(db, 'staff', snapshot.docs[0].id))
+        const found = snapshot.docs[0]
+        if (found) {
+          await deleteDoc(doc(db, 'staff', found.id))
         }
       }
     }

@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 max-w-7xl mx-auto font-sans bg-gray-50/50 min-h-screen rounded-3xl page-enter-anim">
+  <div class="p-6 max-w-7xl mx-auto font-sans bg-sand-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader title="Services de l'hôtel" subtitle="Découvrez l'ensemble des prestations proposées à nos clients." />
 
     <EmptyState
@@ -12,7 +12,7 @@
       <button
         v-for="service in services"
         :key="service.id"
-        class="group relative text-left rounded-2xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+        class="group relative text-left rounded-2xl overflow-hidden shadow-sm border border-sand-200 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
         @click="handleClick(service)"
       >
         <div class="relative h-56 w-full overflow-hidden">
@@ -54,10 +54,6 @@ const servicesStore = useServicesStore()
 const { services } = storeToRefs(servicesStore)
 
 const handleClick = (service: Service) => {
-  if (service.titre === 'Chambres') {
-    router.push('/rooms')
-  } else {
-    router.push(`/service/${service.slug}`)
-  }
+  router.push({ name: 'service-details', params: { slug: service.slug } })
 }
 </script>

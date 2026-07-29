@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100" :class="paddingClass">
+  <div class="bg-white rounded-2xl shadow-sm border border-sand-200 transition-shadow duration-200" :class="paddingClass">
     <slot />
   </div>
 </template>

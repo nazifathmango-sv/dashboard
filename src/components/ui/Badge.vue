@@ -1,5 +1,5 @@
 <template>
-  <span class="inline-block px-3 py-1 text-xs rounded-lg border font-medium" :class="toneClasses">
+  <span class="inline-block px-3 py-1 text-xs rounded-lg border font-semibold transition-colors duration-150" :class="toneClasses">
     <slot />
   </span>
 </template>
@@ -18,16 +18,16 @@ const props = withDefaults(
 const toneClasses = computed(() => {
   switch (props.tone) {
     case 'blue':
-      return 'bg-blue-50 text-blue-700 border-blue-100'
+      return 'bg-navy-50 text-navy-400 border-navy-100'
     case 'green':
-      return 'bg-green-50 text-green-700 border-green-100'
+      return 'bg-lagoon-50 text-lagoon-500 border-lagoon-100'
     case 'red':
-      return 'bg-red-50 text-red-700 border-red-100'
+      return 'bg-coral-50 text-coral-500 border-coral-100'
     case 'amber':
-      return 'bg-amber-50 text-amber-700 border-amber-100'
+      return 'bg-gold-50 text-gold-600 border-gold-100'
     case 'gray':
     default:
-      return 'bg-gray-100 text-gray-600 border-gray-200'
+      return 'bg-sand-100 text-navy-400 border-sand-200'
   }
 })
 </script>
