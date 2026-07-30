@@ -60,18 +60,17 @@
           v-for="(reservation, index) in paginatedReservations"
           :key="reservation.id"
           :style="{ transitionDelay: `${Math.min(index * 20, 200)}ms` }"
-          class="p-5 md:grid md:grid-cols-6 gap-3 items-center border-b border-l-4 hover:bg-sand-50 hover:shadow-sm transition-colors duration-150"
+          class="p-5 md:grid md:grid-cols-6 gap-3 items-center border-b border-l-4 hover:bg-sand-50 hover:shadow-sm transition-colors duration-150 cursor-pointer"
           :class="rowBorderClass(reservation)"
+          @click="openDetails(reservation)"
         >
           <div class="flex items-center gap-3">
             <Avatar :name="reservation.name" />
-            <button
-              type="button"
-              @click="openDetails(reservation)"
-              class="text-navy-500 font-medium cursor-pointer transition-colors duration-150 hover:text-navy-300 text-left rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400"
+            <div
+              class="text-navy-500 font-medium transition-colors duration-150 hover:text-navy-300 text-left rounded"
             >
               {{ reservation.name }}
-            </button>
+            </div>
           </div>
           <div>
             <Badge tone="blue">{{ reservation.type }}</Badge>
@@ -86,10 +85,10 @@
             <Badge :tone="stayStatusTone(reservation.stayStatus)">{{ reservation.stayStatus }}</Badge>
           </div>
           <div class="flex md:justify-center items-center gap-2 mt-3 md:mt-0">
-            <BaseButton size="sm" variant="secondary" title="Modifier" @click="editReservation(reservation)">
+            <BaseButton size="sm" variant="secondary" title="Modifier" @click.stop="editReservation(reservation)">
               <Icon name="edit" class="w-4 h-4" />
             </BaseButton>
-            <BaseButton size="sm" variant="danger" title="Supprimer" @click="confirmDelete(reservation.id)">
+            <BaseButton size="sm" variant="danger" title="Supprimer" @click.stop="confirmDelete(reservation.id)">
               <Icon name="trash" class="w-4 h-4" />
             </BaseButton>
           </div>
@@ -117,6 +116,8 @@
               <FormField
                 v-model="form.phone"
                 type="tel"
+                inputmode="tel"
+                pattern="^[0-9+()\-\s]+$"
                 label="Téléphone"
                 placeholder="+229 01 00 00 00 00"
                 :invalid="!!errors.phone"
@@ -139,13 +140,15 @@
                 :invalid="!!errors.identityCard"
                 :error="errors.identityCard"
               />
-              <FormField
+              <SelectField
                 v-model="form.country"
-                label="Pays de résidence"
-                placeholder="Bénin"
+                label="Pays de provenance"
                 :invalid="!!errors.country"
                 :error="errors.country"
-              />
+              >
+                <option value="">Sélectionner un pays</option>
+                <option v-for="pays in paysOptions" :key="pays" :value="pays">{{ pays }}</option>
+              </SelectField>
             </div>
           </div>
         </div>
@@ -153,13 +156,15 @@
         <div>
           <h4 class="text-sm font-semibold text-navy-400 mb-3 pb-2 border-b border-sand-200">Séjour</h4>
           <div class="space-y-4">
-            <FormField
+            <SelectField
               v-model="form.type"
               label="Type de réservation"
-              placeholder="Chambre / Salle de fête / Spa"
               :invalid="!!errors.type"
               :error="errors.type"
-            />
+            >
+              <option value="">Sélectionner un service</option>
+              <option v-for="service in services" :key="service.id" :value="service.titre">{{ service.titre }}</option>
+            </SelectField>
             <SelectField v-model="roomIdField" label="Chambre associée (optionnel)">
               <option value="">Aucune (prestation hors chambre)</option>
               <option v-for="room in rooms" :key="room.id" :value="room.id">{{ room.titre }}</option>
@@ -208,6 +213,7 @@ import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useReservationsStore } from '@/stores/reservations'
 import { useRoomsStore } from '@/stores/rooms'
+import { useServicesStore } from '@/stores/services'
 import type { Reservation, StayStatus } from '@/data/reservations'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import PageCard from '@/components/ui/PageCard.vue'
@@ -226,6 +232,40 @@ const router = useRouter()
 const reservationsStore = useReservationsStore()
 const { reservations } = storeToRefs(reservationsStore)
 const { rooms } = storeToRefs(useRoomsStore())
+const servicesStore = useServicesStore()
+const { services } = storeToRefs(servicesStore)
+
+const paysOptions = [
+  'Bénin',
+  'Burkina Faso',
+  'Côte d’Ivoire',
+  'Mali',
+  'Sénégal',
+  'Togo',
+  'Niger',
+  'Guinée',
+  'Gabon',
+  'Cameroun',
+  'France',
+  'Belgique',
+  'Suisse',
+  'Canada',
+  'Maroc',
+  'Algérie',
+  'Tunisie',
+  'Espagne',
+  'Italie',
+  'Allemagne',
+  'Royaume-Uni',
+  'États-Unis',
+  'Congo',
+  'Rwanda',
+  'Burundi',
+  'Madagascar',
+  'Maurice',
+  'Île Maurice',
+  'Autre',
+]
 
 const PAGE_SIZE = 10
 
@@ -322,7 +362,7 @@ function validate(): boolean {
     ['phone', 'Le téléphone est requis.'],
     ['email', "L'email est requis."],
     ['identityCard', 'La pièce d’identité est requise.'],
-    ['country', 'Le pays est requis.'],
+    ['country', 'Le pays de provenance est requis.'],
     ['type', 'Le type de réservation est requis.'],
     ['dateDebut', 'La date de début est requise.'],
     ['dateFin', 'La date de fin est requise.'],
@@ -331,6 +371,9 @@ function validate(): boolean {
     if (!form.value[field]?.toString().trim()) {
       errors.value[field] = message
     }
+  }
+  if (form.value.phone && !/^[0-9+()\s-]+$/.test(form.value.phone.trim())) {
+    errors.value.phone = 'Le téléphone ne doit contenir que des chiffres, espaces, parenthèses ou +.'
   }
   return Object.keys(errors.value).length === 0
 }

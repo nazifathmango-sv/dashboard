@@ -13,7 +13,7 @@
       <input
         v-model="searchQuery"
         type="text"
-        placeholder="Rechercher par nom ou pays..."
+        placeholder="Rechercher par nom ou numéro de pièce..."
         class="w-full md:w-96 px-4 py-2.5 bg-sand-50 border border-sand-300 rounded-xl text-sm text-navy-400 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:bg-white transition"
       />
     </PageCard>
@@ -64,18 +64,15 @@
           v-for="(client, index) in paginatedClients"
           :key="client.id"
           :style="{ transitionDelay: `${Math.min(index * 20, 200)}ms` }"
-          class="p-5 md:grid md:grid-cols-4 gap-6 items-center border-b hover:bg-sand-50 hover:shadow-sm transition-colors duration-150"
+          class="p-5 md:grid md:grid-cols-4 gap-6 items-center border-b hover:bg-sand-50 hover:shadow-sm transition-colors duration-150 cursor-pointer"
+          @click="openDetails(client)"
         >
           <div class="flex items-center gap-3">
             <Avatar :name="`${client.nom} ${client.prenom}`" />
             <div>
-              <button
-                type="button"
-                class="text-navy-500 font-medium text-left hover:text-navy-300 transition-colors duration-150 cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2"
-                @click="openDetails(client)"
-              >
+              <div class="text-navy-500 font-medium text-left transition-colors duration-150 hover:text-navy-300 rounded">
                 {{ client.nom }} {{ client.prenom }}
-              </button>
+              </div>
               <Badge tone="gray" class="mt-1">{{ client.paysProvenance }}</Badge>
             </div>
           </div>
@@ -86,10 +83,10 @@
             {{ client.nationalite }}
           </div>
           <div class="flex md:justify-center items-center gap-3 mt-3 md:mt-0">
-            <BaseButton size="sm" variant="secondary" title="Modifier" @click="editClient(client)">
+            <BaseButton size="sm" variant="secondary" title="Modifier" @click.stop="editClient(client)">
               <Icon name="edit" class="w-4 h-4" />
             </BaseButton>
-            <BaseButton size="sm" variant="danger" title="Supprimer" @click="confirmDelete(client.id)">
+            <BaseButton size="sm" variant="danger" title="Supprimer" @click.stop="confirmDelete(client.id)">
               <Icon name="trash" class="w-4 h-4" />
             </BaseButton>
           </div>
@@ -143,13 +140,15 @@
                 :invalid="!!errors.lieuNaissance"
                 :error="errors.lieuNaissance"
               />
-              <FormField
+              <SelectField
                 v-model="form.nationalite"
                 label="Nationalité"
-                placeholder="Béninoise"
                 :invalid="!!errors.nationalite"
                 :error="errors.nationalite"
-              />
+              >
+                <option value="">Sélectionner une nationalité</option>
+                <option v-for="nation in paysOptions" :key="nation" :value="nation">{{ nation }}</option>
+              </SelectField>
             </div>
           </div>
         </div>
@@ -161,6 +160,8 @@
               <FormField
                 v-model="form.phone"
                 type="tel"
+                inputmode="tel"
+                pattern="^[0-9+()\-\s]+$"
                 label="Téléphone"
                 placeholder="+229 01 00 00 00 00"
                 :invalid="!!errors.phone"
@@ -190,8 +191,8 @@
             />
             <FormField
               v-model="form.paysProvenance"
-              label="Pays de provenance"
-              placeholder="Bénin"
+              label="Numéro de la pièce"
+              placeholder="N°123456789"
               :invalid="!!errors.paysProvenance"
               :error="errors.paysProvenance"
             />
@@ -314,12 +315,15 @@ function validate(): boolean {
     ['phone', 'Le téléphone est requis.'],
     ['adresse', "L'adresse est requise."],
     ['typePiece', 'Le type de pièce est requis.'],
-    ['paysProvenance', 'Le pays de provenance est requis.'],
+    ['paysProvenance', 'Le numéro de la pièce est requis.'],
   ]
   for (const [field, message] of requiredFields) {
     if (!form.value[field]?.toString().trim()) {
       errors.value[field] = message
     }
+  }
+  if (form.value.phone && !/^[0-9+()\s-]+$/.test(form.value.phone.trim())) {
+    errors.value.phone = 'Le téléphone ne doit contenir que des chiffres, espaces, parenthèses ou +.'
   }
   return Object.keys(errors.value).length === 0
 }

@@ -1,7 +1,6 @@
-<template>
+<template>pop
   <div class="p-6 max-w-7xl mx-auto font-sans bg-sand-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader title="Services de l'hôtel" subtitle="Découvrez l'ensemble des prestations proposées à nos clients." />
-
     <EmptyState
       v-if="services.length === 0"
       title="Aucun service disponible"

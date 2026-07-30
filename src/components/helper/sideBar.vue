@@ -4,8 +4,6 @@
   >
 
     <div>
-
-      <!-- LOGO -->
       <div class="text-center mb-10 cursor-pointer">
 
         <h1 class="text-3xl font-extrabold tracking-wide text-sand-50">
@@ -19,7 +17,6 @@
       </div>
 
 
-      <!-- MENU -->
       <div class="flex flex-col gap-6">
 
 
@@ -44,7 +41,6 @@
             >
 
 
-              <!-- MENU SIMPLE -->
               <RouterLink
                 v-if="!item.children"
                 :to="item.path"
@@ -67,7 +63,6 @@
 
 
 
-              <!-- MENU AVEC SOUS MENU -->
               <div v-else>
 
 
@@ -168,7 +163,6 @@ const toggleMenu = (name: string) => {
   openMenu.value = openMenu.value === name ? null : name
 }
 
-// rôle de l'utilisateur connecté (réactif, source de vérité Firestore)
 const { role } = storeToRefs(useAuthStore())
 
 const sections = [
@@ -177,6 +171,8 @@ const sections = [
     items: [
       { name: 'Tableau de bord', icon: 'dashboard', path: '/charts' },
       { name: 'Planning', icon: 'calendar', path: '/charts/planning' },
+      { name: 'Incidents', icon: 'booking', path: '/charts/incidents', role: ['administrateur'] },
+
     ],
   },
   {
