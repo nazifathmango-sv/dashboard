@@ -3,6 +3,7 @@ export interface StaffMember {
   name: string
   poste: string
   phone: string
+  email: string
   status: 'Actif' | 'Inactif'
   docId?: string
 }
@@ -15,6 +16,7 @@ export const staff: StaffMember[] = [
     name: 'AGBOTON Rachelle',
     poste: 'Réceptionniste',
     phone: '+229 01 62 00 00 00',
+    email: 'agboton.rachelle@sunbeachhotel.com',
     status: 'Actif',
   },
   {
@@ -22,6 +24,7 @@ export const staff: StaffMember[] = [
     name: 'DOSSOU Marcel',
     poste: 'Chef de cuisine',
     phone: '+229 01 63 00 00 00',
+    email: 'dossou.marcel@sunbeachhotel.com',
     status: 'Actif',
   },
   {
@@ -29,6 +32,7 @@ export const staff: StaffMember[] = [
     name: 'HOUNSOU Bernadette',
     poste: 'Femme de chambre',
     phone: '+229 01 64 00 00 00',
+    email: 'hounsou.bernadette@sunbeachhotel.com',
     status: 'Inactif',
   },
 ]

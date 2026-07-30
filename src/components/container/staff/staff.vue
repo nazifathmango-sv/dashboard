@@ -9,6 +9,16 @@
       </template>
     </PageHeader>
 
+    <div class="mb-6 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-600">
+      À l'ajout d'un employé, un email de définition de mot de passe est automatiquement envoyé pour lui
+      donner accès au tableau de bord (rôle réceptionniste). La modification d'une fiche existante n'envoie
+      aucun email et n'affecte pas ses identifiants de connexion.
+    </div>
+
+    <p v-if="formError" class="mb-6 rounded-xl border border-coral-200 bg-coral-50 px-4 py-3 text-sm text-coral-500" role="alert">
+      {{ formError }}
+    </p>
+
     <PageCard class="mb-6">
       <input
         v-model="searchQuery"
@@ -67,12 +77,15 @@
           class="p-5 md:grid md:grid-cols-4 gap-6 items-center border-b border-l-4 hover:bg-sand-50 hover:shadow-sm transition-colors duration-150"
           :class="member.status === 'Actif' ? 'border-lagoon-500' : 'border-sand-300'"
         >
-          <div class="flex items-center gap-3">
-            <Avatar :name="member.name" />
-            <div class="text-navy-500 font-medium">
-              {{ member.name }}
+          <div class="flex items-center gap-3 min-w-0">
+            <Avatar :name="member.name" class="shrink-0" />
+            <div class="min-w-0">
+              <div class="text-navy-500 font-medium truncate">
+                {{ member.name }}
+              </div>
+              <div class="text-xs text-navy-200 truncate">{{ member.email }}</div>
             </div>
-            <Badge :tone="member.status === 'Actif' ? 'green' : 'gray'">{{ member.status }}</Badge>
+            <Badge class="shrink-0" :tone="member.status === 'Actif' ? 'green' : 'gray'">{{ member.status }}</Badge>
           </div>
           <div class="text-navy-300 text-sm mt-2 md:mt-0">
             {{ member.poste }}
@@ -106,6 +119,14 @@
           :error="errors.name"
         />
         <FormField
+          v-model="form.email"
+          type="email"
+          label="Adresse Email"
+          placeholder="exemple@sunbeachhotel.com"
+          :invalid="!!errors.email"
+          :error="errors.email"
+        />
+        <FormField
           v-model="form.poste"
           label="Poste"
           placeholder="Réceptionniste"
@@ -126,7 +147,7 @@
         </SelectField>
         <div class="flex justify-end gap-3 pt-5">
           <BaseButton type="button" variant="secondary" @click="closePopup">Annuler</BaseButton>
-          <BaseButton type="submit">{{ isEditing ? 'Confirmer la modification' : 'Enregistrer' }}</BaseButton>
+          <BaseButton type="submit" :loading="saving">{{ isEditing ? 'Confirmer la modification' : 'Enregistrer' }}</BaseButton>
         </div>
       </form>
     </Modal>
@@ -180,6 +201,7 @@ const emptyForm = (): StaffFormData => ({
   name: '',
   poste: '',
   phone: '',
+  email: '',
   status: 'Actif',
 })
 const form = ref<StaffFormData>(emptyForm())
@@ -220,16 +242,21 @@ function toggleSort(key: typeof sortKey.value) {
 function validate(): boolean {
   errors.value = {}
   if (!form.value.name.trim()) errors.value.name = 'Le nom est requis.'
+  if (!form.value.email.trim()) errors.value.email = "L'email est requis."
   if (!form.value.poste.trim()) errors.value.poste = 'Le poste est requis.'
   if (!form.value.phone.trim()) errors.value.phone = 'Le téléphone est requis.'
   return Object.keys(errors.value).length === 0
 }
+
+const saving = ref(false)
+const formError = ref('')
 
 const openAddPopup = () => {
   isEditing.value = false
   editId.value = null
   form.value = emptyForm()
   errors.value = {}
+  formError.value = ''
   showPopup.value = true
 }
 const editStaff = (member: StaffMember) => {
@@ -238,19 +265,35 @@ const editStaff = (member: StaffMember) => {
   const { id, ...rest } = member
   form.value = { ...rest }
   errors.value = {}
+  formError.value = ''
   showPopup.value = true
 }
 const closePopup = () => {
   showPopup.value = false
 }
-const saveStaff = () => {
+const saveStaff = async () => {
   if (!validate()) return
-  if (isEditing.value && editId.value !== null) {
-    staffStore.update(editId.value, form.value)
-  } else {
-    staffStore.add(form.value)
+  formError.value = ''
+  saving.value = true
+  try {
+    if (isEditing.value && editId.value !== null) {
+      await staffStore.update(editId.value, form.value)
+    } else {
+      await staffStore.add(form.value)
+    }
+    closePopup()
+  } catch (error: any) {
+    console.error('[saveStaff] erreur lors de l’enregistrement de l’employé :', error)
+    if (error.code === 'auth/email-already-in-use') {
+      formError.value = 'Un compte existe déjà avec cette adresse email.'
+    } else if (error.code === 'auth/invalid-email') {
+      formError.value = 'Adresse email invalide.'
+    } else {
+      formError.value = "Une erreur est survenue lors de l'enregistrement de l'employé."
+    }
+  } finally {
+    saving.value = false
   }
-  closePopup()
 }
 const confirmDelete = (id: number) => {
   deleteId.value = id

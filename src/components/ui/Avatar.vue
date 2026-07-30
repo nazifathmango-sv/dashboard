@@ -12,7 +12,7 @@ import { computed } from 'vue'
 const props = withDefaults(
   defineProps<{
     name: string
-    size?: 'sm' | 'md'
+    size?: 'sm' | 'md' | 'lg'
   }>(),
   {
     size: 'sm',
@@ -21,5 +21,15 @@ const props = withDefaults(
 
 const initial = computed(() => props.name.trim().charAt(0).toUpperCase())
 
-const sizeClasses = computed(() => (props.size === 'md' ? 'w-12 h-12 text-lg' : 'w-9 h-9 text-sm'))
+const sizeClasses = computed(() => {
+  switch (props.size) {
+    case 'lg':
+      return 'w-20 h-20 text-2xl'
+    case 'md':
+      return 'w-12 h-12 text-lg'
+    case 'sm':
+    default:
+      return 'w-9 h-9 text-sm'
+  }
+})
 </script>

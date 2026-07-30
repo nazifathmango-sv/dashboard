@@ -2,12 +2,23 @@
   <div class="p-6 max-w-7xl mx-auto font-sans bg-sand-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader title="Réservations" subtitle="Gestion des réservations clients.">
       <template #actions>
-        <BaseButton @click="openAddPopup">
-          <Icon name="plus" class="w-4 h-4" />
-          Nouvelle réservation
-        </BaseButton>
+        <div class="flex items-center gap-2">
+          <BaseButton v-if="dateRange" variant="ghost" size="sm" @click="dateRange = null">
+            <Icon name="x-mark" class="w-3.5 h-3.5" />
+            Réinitialiser
+          </BaseButton>
+          <DateRangePicker v-model="dateRange" />
+          <BaseButton @click="openAddPopup">
+            <Icon name="plus" class="w-4 h-4" />
+            Nouvelle réservation
+          </BaseButton>
+        </div>
       </template>
     </PageHeader>
+
+    <p v-if="dateRange" class="text-sm text-navy-300 -mt-4 mb-6">
+      Réservations dont le séjour chevauche la période sélectionnée.
+    </p>
 
     <PageCard class="mb-6">
       <input
@@ -20,8 +31,8 @@
 
     <EmptyState
       v-if="filteredReservations.length === 0"
-      title="Aucune réservation trouvée"
-      description="Essayez une autre recherche ou créez une nouvelle réservation."
+      :title="dateRange ? 'Aucune réservation sur cette période' : 'Aucune réservation trouvée'"
+      :description="dateRange ? 'Essayez d\'élargir la plage de dates sélectionnée.' : 'Essayez une autre recherche ou créez une nouvelle réservation.'"
     />
 
     <template v-else>
@@ -227,6 +238,7 @@ import Icon from '@/components/ui/Icon.vue'
 import Avatar from '@/components/ui/Avatar.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 import SortIcon from '@/components/ui/SortIcon.vue'
+import DateRangePicker from '@/components/ui/DateRangePicker.vue'
 
 const router = useRouter()
 const reservationsStore = useReservationsStore()
@@ -279,6 +291,12 @@ const errors = ref<Record<string, string>>({})
 const sortKey = ref<'name' | 'type' | 'dateDebut' | 'dateFin' | 'stayStatus'>('name')
 const sortDirection = ref<'asc' | 'desc'>('asc')
 const currentPage = ref(1)
+const dateRange = ref<{ start: string; end: string } | null>(null)
+
+// Deux plages se chevauchent si l'une commence avant que l'autre finisse, et vice-versa.
+function overlaps(aStart: string, aEnd: string, bStart: string, bEnd: string) {
+  return aStart <= bEnd && bStart <= aEnd
+}
 
 type ReservationFormData = Omit<Reservation, 'id' | 'stayStatus'>
 
@@ -296,10 +314,14 @@ const form = ref<ReservationFormData>(emptyForm())
 
 const filteredReservations = computed(() => {
   const search = searchQuery.value.toLowerCase()
-  return reservations.value.filter(
-    (reservation) =>
-      reservation.name.toLowerCase().includes(search) || reservation.type.toLowerCase().includes(search),
-  )
+  return reservations.value.filter((reservation) => {
+    const matchesSearch =
+      reservation.name.toLowerCase().includes(search) || reservation.type.toLowerCase().includes(search)
+    const matchesDate =
+      !dateRange.value ||
+      overlaps(reservation.dateDebut, reservation.dateFin, dateRange.value.start, dateRange.value.end)
+    return matchesSearch && matchesDate
+  })
 })
 
 const sortedReservations = computed(() => {
@@ -315,7 +337,7 @@ const paginatedReservations = computed(() =>
   sortedReservations.value.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE),
 )
 
-watch(searchQuery, () => {
+watch([searchQuery, dateRange], () => {
   currentPage.value = 1
 })
 

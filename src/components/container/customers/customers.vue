@@ -2,12 +2,23 @@
   <div class="p-6 max-w-7xl mx-auto font-sans bg-sand-50/50 min-h-screen rounded-3xl page-enter-anim">
     <PageHeader title="Clients" subtitle="Gestion des clients de l'hôtel.">
       <template #actions>
-        <BaseButton @click="openAddPopup">
-          <Icon name="plus" class="w-4 h-4" />
-          Nouveau client
-        </BaseButton>
+        <div class="flex items-center gap-2">
+          <BaseButton v-if="dateRange" variant="ghost" size="sm" @click="dateRange = null">
+            <Icon name="x-mark" class="w-3.5 h-3.5" />
+            Réinitialiser
+          </BaseButton>
+          <DateRangePicker v-model="dateRange" />
+          <BaseButton @click="openAddPopup">
+            <Icon name="plus" class="w-4 h-4" />
+            Nouveau client
+          </BaseButton>
+        </div>
       </template>
     </PageHeader>
+
+    <p v-if="dateRange" class="text-sm text-navy-300 -mt-4 mb-6">
+      Clients enregistrés sur la période sélectionnée.
+    </p>
 
     <PageCard class="mb-6">
       <input
@@ -20,8 +31,8 @@
 
     <EmptyState
       v-if="filteredClients.length === 0"
-      title="Aucun client trouvé"
-      description="Essayez une autre recherche ou ajoutez un nouveau client."
+      :title="dateRange ? 'Aucun client enregistré sur cette période' : 'Aucun client trouvé'"
+      :description="dateRange ? 'Essayez d\'élargir la plage de dates sélectionnée.' : 'Essayez une autre recherche ou ajoutez un nouveau client.'"
     />
 
     <template v-else>
@@ -234,6 +245,7 @@ import Icon from '@/components/ui/Icon.vue'
 import Avatar from '@/components/ui/Avatar.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 import SortIcon from '@/components/ui/SortIcon.vue'
+import DateRangePicker from '@/components/ui/DateRangePicker.vue'
 
 const router = useRouter()
 const clientsStore = useClientsStore()
@@ -250,6 +262,7 @@ const errors = ref<Record<string, string>>({})
 const sortKey = ref<'nom' | 'telephone' | 'nationalite'>('nom')
 const sortDirection = ref<'asc' | 'desc'>('asc')
 const currentPage = ref(1)
+const dateRange = ref<{ start: string; end: string } | null>(null)
 
 type ClientFormData = Omit<Client, 'id' | 'telephone' | 'dateEnregistrement'> & { phone: string; email: string }
 
@@ -270,12 +283,16 @@ const form = ref<ClientFormData>(emptyForm())
 
 const filteredClients = computed(() => {
   const search = searchQuery.value.toLowerCase()
-  return clients.value.filter(
-    (client) =>
+  return clients.value.filter((client) => {
+    const matchesSearch =
       client.nom.toLowerCase().includes(search) ||
       client.prenom.toLowerCase().includes(search) ||
-      client.paysProvenance.toLowerCase().includes(search),
-  )
+      client.paysProvenance.toLowerCase().includes(search)
+    const matchesDate =
+      !dateRange.value ||
+      (client.dateEnregistrement >= dateRange.value.start && client.dateEnregistrement <= dateRange.value.end)
+    return matchesSearch && matchesDate
+  })
 })
 
 const sortedClients = computed(() => {
@@ -291,7 +308,7 @@ const paginatedClients = computed(() =>
   sortedClients.value.slice((currentPage.value - 1) * PAGE_SIZE, currentPage.value * PAGE_SIZE),
 )
 
-watch(searchQuery, () => {
+watch([searchQuery, dateRange], () => {
   currentPage.value = 1
 })
 

@@ -153,7 +153,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useServicesStore } from '@/stores/services'
 import { useAuthStore } from '@/stores/auth'
 import Icon from '@/components/ui/Icon.vue'
 
@@ -195,13 +194,19 @@ const sections = [
   },
 ]
 
-// services from Firestore (store will fallback to seed data until Firestore has docs)
-const servicesStore = useServicesStore()
-const { services } = storeToRefs(servicesStore)
+const SERVICE_CATEGORIES = [
+  { name: 'Chambres', category: 'bed' },
+  { name: 'Restaurants', category: 'restaurant' },
+  { name: 'Salle de Réception', category: 'party' },
+  { name: 'Boite de Nuit', category: 'nightclub' },
+  { name: 'Spa', category: 'spa' },
+  { name: 'Salle de Jeux', category: 'games' },
+  { name: 'Salle de Sport', category: 'sport' },
+]
 
 const serviceChildren = computed(() => [
   { name: 'Tous les services', path: '/charts/service' },
-  ...services.value.map((s: any) => ({ name: s.titre, path: `/charts/service/${s.slug}` })),
+  ...SERVICE_CATEGORIES.map((c) => ({ name: c.name, path: `/charts/service?category=${c.category}` })),
 ])
 
 const displayedSections = computed(() =>
