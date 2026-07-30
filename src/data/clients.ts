@@ -15,8 +15,7 @@ export interface Client {
   docId?: string
 }
 
-// TODO: remplacer ce tableau codé en dur par un appel à l'API
-// (ex: GET /api/clients) une fois le backend Firestore prêt.
+
 export const clients: Client[] = [
   {
     id: 1,

@@ -1,5 +1,5 @@
 <template>
-  <header class="flex justify-between items-center gap-4 bg-navy-600 px-6 py-4 shadow-md border-b border-gold-400/10">
+  <header class="flex justify-between items-center gap-4 bg-navy-600 px-6 py-4 shadow-md border-b border-gold-400/10  ">
     <div class="shrink-0">
       <div class="text-2xl font-bold text-sand-50 tracking-tight">
         {{ currentTitle }}
@@ -16,12 +16,14 @@
           placeholder="Rechercher un client ou une réservation..."
           class="w-full pl-9 pr-4 py-2 bg-white/10 border border-white/10 rounded-xl text-sm text-sand-50 placeholder:text-navy-200 focus:outline-none focus:ring-2 focus:ring-gold-400 focus:bg-white/15 transition"
           @focus="showResults = true"
+          @click="isOpen = true"
         />
       </div>
 
       <Transition name="fade">
         <div
-          v-if="showResults && searchQuery.trim() && searchResults.length > 0"
+          v-if="showResults && isOpen && searchQuery.trim() && searchResults.length > 0"
+          ref="modalRef"
           class="absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-sand-200 overflow-hidden z-50"
         >
           <button
@@ -42,7 +44,7 @@
 
       <Transition name="fade">
         <div
-          v-if="showResults && searchQuery.trim() && searchResults.length === 0"
+          v-if="showResults && isOpen && searchQuery.trim() && searchResults.length === 0"
           class="absolute left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-sand-200 px-4 py-3 text-sm text-navy-300 z-50"
         >
           Aucun résultat pour « {{ searchQuery }} ».
@@ -61,7 +63,7 @@
         {{ arrivalsToday }} arrivée{{ arrivalsToday > 1 ? 's' : '' }} aujourd'hui
       </button>
 
-      <div class="relative">
+      <div class="relative" ref="adminMenuRef">
         <button
           @click="showAdminMenu = !showAdminMenu"
           class="flex items-center gap-3 text-sand-50 hover:bg-white/5 rounded-xl pl-2 pr-3 py-1.5 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-offset-2 focus-visible:ring-offset-navy-600"
@@ -96,7 +98,7 @@
             </div>
             <button
               @click="logout"
-              class="w-full text-left px-4 py-3 text-sm text-navy-400 hover:bg-sand-100 transition cursor-pointer flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-inset"
+              class="w-full text-left px-4 py-3 text-sm text-white bg-red-500 transition cursor-pointer flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400 focus-visible:ring-inset"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3H21" />
@@ -110,6 +112,7 @@
   </header>
 </template>
 <script setup lang="ts">
+defineOptions({ name: 'AppHeader' })
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
@@ -150,6 +153,7 @@ const titles: Record<string, string> = {
   reservations: 'Réservations',
   'reservation-details': 'Détails de la réservation',
   planning: 'Planning',
+  incidents:'Incidents',
   customers: 'Clients',
   'customer-details': 'Détails du client',
   service: 'Service',
@@ -179,7 +183,6 @@ const searchContainer = ref<HTMLElement | null>(null)
 const searchResults = computed<SearchResult[]>(() => {
   const query = searchQuery.value.trim().toLowerCase()
   if (!query) return []
-
   const clientResults: SearchResult[] = clients.value
     .filter((client) => `${client.nom} ${client.prenom}`.toLowerCase().includes(query))
     .map((client) => ({ type: 'client', id: client.id, label: `${client.nom} ${client.prenom}` }))
@@ -212,6 +215,17 @@ onMounted(() => {
 })
 onUnmounted(() => {
   document.removeEventListener('mousedown', handleClickOutside)
+})
+import { onClickOutside } from '@vueuse/core'
+import { incidents } from '@/data/incidents'
+const isOpen = ref(false)
+const modalRef = ref<HTMLElement | null>(null)
+const adminMenuRef = ref<HTMLElement | null>(null)
+onClickOutside(modalRef, () => {
+  isOpen.value = false
+})
+onClickOutside(adminMenuRef, () => {
+  showAdminMenu.value = false
 })
 </script>
 <style scoped>

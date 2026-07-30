@@ -59,7 +59,7 @@
           <div class="group transition-all duration-200 hover:pl-1">
             <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-navy-300">
               <Icon name="location" class="w-3.5 h-3.5" />
-              Pays de provenance
+              Numéro de pièce
             </p>
             <p class="mt-1 font-medium text-navy-500">{{ client.paysProvenance }}</p>
           </div>

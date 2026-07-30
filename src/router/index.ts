@@ -7,6 +7,7 @@ import CustomersView from '@/views/customers/index.vue'
 import ServiceView from '@/views/service/index.vue'
 import StaffView from '@/views/staff/index.vue'
 import PlanningView from '@/views/planning/index.vue'
+import IncidentsView from '@/views/incidents/index.vue'
 import HomeView from '@/components/helper/homeView.vue'
 import Login from '@/components/container/connexion/login.vue'
 import password from '@/components/container/connexion/password.vue'
@@ -101,6 +102,17 @@ const router = createRouter({
             roles:[
               "administrateur",
               "receptionniste"
+            ]
+          }
+        },
+
+        {
+          path: 'incidents',
+          name: 'incidents',
+          component: IncidentsView,
+          meta:{
+            roles:[
+              "administrateur"
             ]
           }
         },
