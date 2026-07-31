@@ -19,8 +19,8 @@
       <Icon name="calendar" class="w-4 h-4 shrink-0" />
       <span>
         Plage sélectionnée trop large ({{ requestedLength }} jours). Affichage limité aux
-        {{ MAX_VISIBLE_DAYS }} premiers jours, du {{ formatDateFull(days[0]) }} au
-        {{ formatDateFull(days[days.length - 1]) }}. Affinez la sélection pour voir le reste de la période.
+        {{ MAX_VISIBLE_DAYS }} premiers jours, du {{ formatDateFull(days[0] ?? '') }} au
+{{ formatDateFull(days[days.length - 1] ?? '') }}.
       </span>
     </div>
 
@@ -65,7 +65,7 @@
       <div class="bg-white rounded-2xl shadow-sm p-5 border border-sand-200 transition-all duration-300 hover:shadow-md">
         <h2 class="text-lg font-bold mb-1 text-navy-500">Arrivées et départs par jour</h2>
         <p class="text-sm text-navy-300 mb-4">
-          Du {{ formatDateFull(days[0]) }} au {{ formatDateFull(days[days.length - 1]) }}
+        Du {{ formatDateFull(days[0] ?? '') }} au {{ formatDateFull(days[days.length - 1] ?? '') }}
         </p>
         <EmptyState
           v-if="arrivalsDeparturesTotal === 0"
@@ -400,12 +400,22 @@ const occupancyRateInRange = computed(() =>
 const arrivalsInRange = computed(() => {
   const start = days.value[0]
   const end = days.value[days.value.length - 1]
-  return reservationsStore.reservations.filter((r) => r.dateDebut >= start && r.dateDebut <= end).length
+
+  if (!start || !end) return 0
+
+  return reservationsStore.reservations.filter(
+    (r) => r.dateDebut >= start && r.dateDebut <= end,
+  ).length
 })
 const departuresInRange = computed(() => {
   const start = days.value[0]
   const end = days.value[days.value.length - 1]
-  return reservationsStore.reservations.filter((r) => r.dateFin >= start && r.dateFin <= end).length
+
+  if (!start || !end) return 0
+
+  return reservationsStore.reservations.filter(
+    (r) => r.dateFin >= start && r.dateFin <= end,
+  ).length
 })
 
 const arrivalsPerDay = computed(() =>

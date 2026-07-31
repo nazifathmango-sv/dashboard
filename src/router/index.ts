@@ -13,6 +13,7 @@ import Login from '@/components/container/connexion/login.vue'
 import password from '@/components/container/connexion/password.vue'
 import reset from '@/components/container/connexion/reset.vue'
 import AdminView from '@/views/admin/index.vue'
+import Reset from '@/views/reset/reset.vue'
 
 
 const router = createRouter({
@@ -35,8 +36,8 @@ const router = createRouter({
 
 
     {
-      path: '/password',
-      name: 'password',
+      path: '/login',
+      name: '',
       component: password,
     },
 
@@ -45,6 +46,11 @@ const router = createRouter({
       path: '/reset',
       name: 'reset',
       component: reset,
+    },
+{
+      path: '/set-password',
+      name: 'set-password',
+      component: Reset,
     },
 
 
@@ -214,33 +220,28 @@ const router = createRouter({
 
 })
 
-router.beforeEach(async (to, from, next) => {
-
+ router.beforeEach(async (to) => {
   if (!to.meta.roles) {
-    next()
-    return
+    return true
   }
 
   const authStore = useAuthStore()
+
   await authStore.waitUntilReady()
 
   const role = authStore.role
-
   if (!role) {
-    next('/login')
-    return
+    return '/login'
   }
 
   const allowedRoles = to.meta.roles as string[]
 
+  // Rôle non autorisé
   if (!allowedRoles.includes(role)) {
-    next('/charts')
-    return
+    return '/charts'
   }
 
-  next()
-
+  return true
 })
-
 
 export default router

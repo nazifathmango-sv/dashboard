@@ -266,6 +266,18 @@ const dateRange = ref<{ start: string; end: string } | null>(null)
 
 type ClientFormData = Omit<Client, 'id' | 'telephone' | 'dateEnregistrement'> & { phone: string; email: string }
 
+const paysOptions = [
+  'Bénin',
+  'Togo',
+  'Ghana',
+  'Nigeria',
+  'Côte d’Ivoire',
+  'Burkina Faso',
+  'Niger',
+  'Sénégal',
+  'Cameroun',
+  'France',
+]
 const emptyForm = (): ClientFormData => ({
   nom: '',
   prenom: '',

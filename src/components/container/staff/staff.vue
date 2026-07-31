@@ -10,9 +10,7 @@
     </PageHeader>
 
     <div class="mb-6 rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm text-gold-600">
-      À l'ajout d'un employé, un email de définition de mot de passe est automatiquement envoyé pour lui
-      donner accès au tableau de bord (rôle réceptionniste). La modification d'une fiche existante n'envoie
-      aucun email et n'affecte pas ses identifiants de connexion.
+      L'ajout d'un employé permet uniquement d'enregistrer ses informations dans le personnel de l'hôtel. Aucun compte de connexion au tableau de bord n'est créé.
     </div>
 
     <p v-if="formError" class="mb-6 rounded-xl border border-coral-200 bg-coral-50 px-4 py-3 text-sm text-coral-500" role="alert">

@@ -105,8 +105,8 @@ function clearSearch() {
 }
 
 function statusTone(status: Incident['status']) {
-  if (status === 'Ouvert') return 'danger'
-  if (status === 'En cours') return 'warning'
-  return 'success'
+  if (status === 'Ouvert') return 'red'
+  if (status === 'En cours') return 'amber'
+  return 'green'
 }
 </script>

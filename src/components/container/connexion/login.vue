@@ -39,211 +39,106 @@
 
 
 <script setup lang="ts">
-
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-
-
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
 
-
 import { auth, db } from '@/firebase'
 import { useAuthStore } from '@/stores/auth'
-
 
 import Img from '@/assets/img/pe.webp'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import FormField from '@/components/ui/FormField.vue'
 
-
-
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
 
-
 const router = useRouter()
 const authStore = useAuthStore()
 
-
-
 const handleLogin = async () => {
-
-
   errorMessage.value = ''
 
-
-
   try {
-
     const userCredential = await signInWithEmailAndPassword(
-
       auth,
-
       email.value.trim(),
-
-      password.value
-
+      password.value,
     )
-
-
 
     const uid = userCredential.user.uid
 
+    console.log('Utilisateur connecté UID :', uid)
 
-
-    console.log(
-      "Utilisateur connecté UID :",
-      uid
-    )
-
-
-
-    // Recherche du profil dans Firestore
     const userDoc = await getDoc(
-
-      doc(
-        db,
-        "utilisateur",
-        uid
-      )
-
+      doc(db, 'utilisateur', uid),
     )
 
-
-
-
-    if(userDoc.exists()) {
-
-
-
-      const userData = userDoc.data()
-
-
-
-      console.log(
-        "Données utilisateur :",
-        userData
-      )
-
-
-
-
-      if(!userData.role){
-
-
-        errorMessage.value =
-        "Aucun rôle défini pour cet utilisateur"
-
-
-        return
-
-      }
-
-
-
-
-      // Attendre que le store d'auth soit synchronisé avant de rediriger
-      await authStore.waitUntilReady()
-
-      // Redirection dashboard
-      router.push('/charts')
-
-
-
-
+    if (!userDoc.exists()) {
+      errorMessage.value = 'Aucun profil utilisateur trouvé.'
+      return
     }
 
-    else {
+    const userData = userDoc.data()
 
+    console.log('Données utilisateur :', userData)
 
+    if (!userData.role) {
+      errorMessage.value = 'Aucun rôle défini pour cet utilisateur.'
+      return
+    }
 
-      console.log(
-        "Aucun profil Firestore trouvé pour :",
-        uid
-      )
+    const role = userData.role
 
-
-
+    if (
+      role !== 'administrateur' &&
+      role !== 'receptionniste'
+    ) {
       errorMessage.value =
-      "Aucun profil utilisateur trouvé"
-
-
-
+        'Vous n’êtes pas autorisé à accéder au tableau de bord.'
+      return
     }
 
+    if (userData.status === 'Inactif') {
+      errorMessage.value =
+        'Ce compte est actuellement désactivé.'
+      return
+    }
 
+    localStorage.setItem('role', role)
+    localStorage.setItem('userUid', uid)
 
+    await authStore.waitUntilReady()
 
+    await router.push('/charts')
+
+  } catch (error: any) {
+    console.error('Erreur Firebase :', error)
+
+    if (error.code === 'auth/user-not-found') {
+      errorMessage.value = 'Utilisateur inexistant.'
+
+    } else if (error.code === 'auth/wrong-password') {
+      errorMessage.value = 'Mot de passe incorrect.'
+
+    } else if (error.code === 'auth/invalid-credential') {
+      errorMessage.value =
+        'Email ou mot de passe incorrect.'
+
+    } else if (error.code === 'auth/too-many-requests') {
+      errorMessage.value =
+        'Trop de tentatives. Veuillez réessayer plus tard.'
+
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage.value =
+        'Adresse email invalide.'
+
+    } else {
+      errorMessage.value =
+        'Une erreur est survenue lors de la connexion.'
+    }
   }
-
-
-
-  catch(error:any) {
-
-
-
-    console.log(
-      "Erreur Firebase :",
-      error.code
-    )
-
-
-
-    if(error.code === "auth/user-not-found"){
-
-
-      errorMessage.value =
-      "Utilisateur inexistant"
-
-
-
-    }
-
-
-
-    else if(error.code === "auth/wrong-password"){
-
-
-      errorMessage.value =
-      "Mot de passe incorrect"
-
-
-
-    }
-
-
-
-    else if(error.code === "auth/invalid-credential"){
-
-
-      errorMessage.value =
-      "Email ou mot de passe incorrect"
-
-
-
-    }
-
-
-
-    else{
-
-
-      errorMessage.value =
-      "Erreur de connexion"
-
-
-
-    }
-
-
-
-  }
-
-
 }
-
-
-
 </script>
