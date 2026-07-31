@@ -12,7 +12,7 @@
           <p class="mb-8 text-center text-sm text-coral-500" role="alert">
             {{ invalidCodeMessage || "Ce lien de réinitialisation est invalide. Merci d'en redemander un nouveau." }}
           </p>
-          <RouterLink to="/password" class="block w-full">
+          <RouterLink to="/login" class="block w-full">
             <BaseButton type="button" class="w-full">Redemander un lien</BaseButton>
           </RouterLink>
         </template>
@@ -70,7 +70,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { verifyPasswordResetCode, confirmPasswordReset } from 'firebase/auth'
 import { auth } from '@/firebase'
 import Img from '@/assets/img/pe.webp'
@@ -78,6 +78,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import FormField from '@/components/ui/FormField.vue'
 
 const route = useRoute()
+const router = useRouter()
 
 const oobCode = ref<string | null>(null)
 const accountEmail = ref('')
@@ -119,6 +120,9 @@ const handleSubmit = async () => {
   try {
     await confirmPasswordReset(auth, oobCode.value as string, newPassword.value)
     success.value = true
+    setTimeout(() => {
+      router.push('/login')
+    }, 2000)
   } catch {
     invalidCodeMessage.value = 'Ce lien de réinitialisation a expiré ou a déjà été utilisé.'
   } finally {

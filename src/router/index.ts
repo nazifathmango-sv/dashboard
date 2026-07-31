@@ -13,7 +13,6 @@ import Login from '@/components/container/connexion/login.vue'
 import password from '@/components/container/connexion/password.vue'
 import reset from '@/components/container/connexion/reset.vue'
 import AdminView from '@/views/admin/index.vue'
-import Reset from '@/views/reset/reset.vue'
 
 
 const router = createRouter({
@@ -36,8 +35,8 @@ const router = createRouter({
 
 
     {
-      path: '/login',
-      name: '',
+      path: '/password',
+      name: 'password',
       component: password,
     },
 
@@ -46,11 +45,6 @@ const router = createRouter({
       path: '/reset',
       name: 'reset',
       component: reset,
-    },
-{
-      path: '/set-password',
-      name: 'set-password',
-      component: Reset,
     },
 
 
