@@ -158,18 +158,10 @@ export const useAccountsStore = defineStore('accounts', () => {
       /**
        * 3. Envoi du mail pour définir le mot de passe
        */
-      console.log('[accountsStore.add] Envoi du mail à :', email)
-
-await sendPasswordResetEmail(
-  secondaryAuth,
-  email,
-  {
-    url: 'https://dashboard-cfe41.web.app/reset',
-    handleCodeInApp: false,
-  },
-)
-
-console.log('[accountsStore.add] Mail envoyé avec succès à :', email)
+      await sendPasswordResetEmail(secondaryAuth, email, {
+        url: `${window.location.origin}/reset`,
+        handleCodeInApp: true,
+      })
 
       /**
        * 4. Mise à jour de la liste locale
