@@ -136,9 +136,20 @@ const pendingStart = ref<string | null>(props.modelValue?.start ?? null)
 const pendingEnd = ref<string | null>(props.modelValue?.end ?? null)
 const cursor = ref(startOfMonth(props.modelValue?.start ?? todayISO()))
 
-function parseYearMonth(iso: string) {
-  const [year, month] = iso.split('-').map(Number)
-  return { year, month: month - 1 }
+function parseYearMonth(iso: string): { year: number; month: number } {
+  const parts = iso.split('-').map(Number)
+
+  const year = parts[0]
+  const month = parts[1]
+
+  if (year === undefined || month === undefined) {
+    throw new Error(`Date invalide : ${iso}`)
+  }
+
+  return {
+    year,
+    month: month - 1,
+  }
 }
 
 const leftMonth = computed(() => parseYearMonth(cursor.value))

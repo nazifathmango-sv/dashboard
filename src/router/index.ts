@@ -214,33 +214,28 @@ const router = createRouter({
 
 })
 
-router.beforeEach(async (to, from, next) => {
-
+ router.beforeEach(async (to) => {
   if (!to.meta.roles) {
-    next()
-    return
+    return true
   }
 
   const authStore = useAuthStore()
+
   await authStore.waitUntilReady()
 
   const role = authStore.role
-
   if (!role) {
-    next('/login')
-    return
+    return '/login'
   }
 
   const allowedRoles = to.meta.roles as string[]
 
+  // Rôle non autorisé
   if (!allowedRoles.includes(role)) {
-    next('/charts')
-    return
+    return '/charts'
   }
 
-  next()
-
+  return true
 })
-
 
 export default router
