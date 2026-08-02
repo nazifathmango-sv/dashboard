@@ -1,10 +1,21 @@
 <template>
-  <header class="flex justify-between items-center gap-4 bg-navy-600 px-6 py-4 shadow-md border-b border-gold-400/10  ">
-    <div class="shrink-0">
-      <div class="text-2xl font-bold text-sand-50 tracking-tight">
-        {{ currentTitle }}
+  <header class="flex justify-between items-center gap-4 bg-navy-600 px-4 py-4 shadow-md border-b border-gold-400/10 md:px-6  ">
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/10 p-2 text-sand-50 hover:bg-white/15 md:hidden"
+        @click="$emit('toggle-sidebar')"
+        aria-label="Ouvrir le menu"
+      >
+        <Icon name="menu" class="w-5 h-5" />
+      </button>
+
+      <div class="shrink-0">
+        <div class="text-2xl font-bold text-sand-50 tracking-tight">
+          {{ currentTitle }}
+        </div>
+        <p class="text-xs text-navy-200 mt-0.5 capitalize">{{ todayLabel }}</p>
       </div>
-      <p class="text-xs text-navy-200 mt-0.5 capitalize">{{ todayLabel }}</p>
     </div>
 
     <div ref="searchContainer" class="relative hidden md:block flex-1 max-w-md">
@@ -169,6 +180,13 @@ const todayLabel = new Date().toLocaleDateString('fr-FR', {
   year: 'numeric',
 })
 const showAdminMenu = ref(false)
+
+const props = defineProps<{
+  sidebarOpen: boolean
+}>()
+const emit = defineEmits<{
+  (e: 'toggle-sidebar'): void
+}>()
 
 interface SearchResult {
   type: 'client' | 'reservation'

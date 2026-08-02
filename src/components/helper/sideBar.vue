@@ -1,6 +1,9 @@
 <template>
   <div
-    class="w-72 h-screen bg-navy-600 text-white p-6 shadow-2xl flex flex-col justify-between overflow-y-auto border-r border-gold-400/10"
+    :class="[
+      'fixed inset-y-0 left-0 z-50 w-72 bg-navy-600 text-white p-6 shadow-2xl flex flex-col justify-between overflow-y-auto border-r border-gold-400/10 transition-transform duration-300 md:static md:translate-x-0',
+      open ? 'translate-x-0' : '-translate-x-full',
+    ]"
   >
 
     <div>
@@ -145,8 +148,16 @@
 
       </div>
 
-    </div>
+      <button
+        type="button"
+        class="mt-6 inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-sm font-semibold text-sand-100 hover:bg-white/15 md:hidden"
+        @click="$emit('close-sidebar')"
+      >
+        <Icon name="x-mark" class="w-4 h-4" />
+        Fermer
+      </button>
 
+    </div>
   </div>
 </template>
 
@@ -155,6 +166,13 @@ import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/auth'
 import Icon from '@/components/ui/Icon.vue'
+
+const props = defineProps<{
+  open: boolean
+}>()
+const emit = defineEmits<{
+  (e: 'close-sidebar'): void
+}>()
 
 const openMenu = ref<string | null>(null)
 
